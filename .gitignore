@@ -1,0 +1,5 @@
+node_modules/
+.firebase/
+선행수익성 자료/
+*.log
+.DS_Store
