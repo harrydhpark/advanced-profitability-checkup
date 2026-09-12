@@ -9,8 +9,8 @@
   const AUTH_CONFIG = {
     ID_HASH: '4ed89d4c95cd896421176fe47e4c9ee9a0baad02dae39f57ce32eef58ec8e942', // 'LGE135'
     PW_HASH: '618db43b60c434d96fa46606dfd55e64a4ee7321f05b6dd846f5b5bea2e7cade', // 'LGE246'
-    SESSION_KEY: 'lge_portal_authenticated_user',
-    TIMESTAMP_KEY: 'lge_portal_auth_timestamp',
+    SESSION_KEY: 'lge_subdash_auth_user',
+    TIMESTAMP_KEY: 'lge_subdash_auth_timestamp',
     TIMEOUT_MS: 30 * 60 * 1000, // 30 minutes
     SECRET: 'LGE_TV_EU_PORTAL_SECRET_2026'
   };
