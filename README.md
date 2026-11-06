@@ -1,56 +1,36 @@
-# LGE Europe TV 선행수익성 분석 대시보드 (Advance Profitability Dashboard)
+# 09. 선행수익성 분석 대시보드 (Advance Profitability Analysis Dashboard)
 
-본 프로젝트는 LGE Europe TV 선행수익성 점검 데이터(`선행점검양식 0722 취합 2.xlsx`)의 원천 시트(`통합DB`, `실적`, `이동`, `판가인하`, `전략제품`, `EU TTL`)를 기반으로 엑셀 연산 수식을 100% JavaScript로 재구현하여 동적 법인별 수익성 분석 웹 시스템을 제공합니다.
-
----
-
-## 📌 주요 특징 및 핵심 개발 지침
-
-### 1. 엑셀 수식 100% JS 완전 재구현 엔진 (`build_from_source_sheets.js`)
-- `SheetJS` 라이브러리의 엑셀 저장 시점 캐시(독일 `DG` 고정) 한계를 극복하기 위해 RAW 시트에서 SUMIFS 및 연산식을 직접 수행합니다.
-- **하이브리드 데이터 매핑 규칙**:
-  - **상반기 (H1, 1~6월)**: `실적` 시트의 2026년 1~6월 실적 Raw 데이터 집계
-  - **하반기 (H2, 7~12월)**: `통합DB` 시트의 2026년 7~12월 사업계획 Raw 데이터 집계
-  - **전년 (2025년)**: `실적` 시트의 2025년 1~12월 실적 Raw 데이터 집계
-  - **이동연간**: `이동` 시트 데이터 (상반기 이동 = 상반기 올해 수량 동일 매핑 적용)
-
-### 2. 주요 지표 연산 공식
-- **수량 / G.ASP / 제상품**: 이동비 = `올해 값 - 이동 값` (연간 수량/G.ASP/제상품 이동비 1:1 완벽 일치)
-- **차감율 (%)**: `1 - (제상품 / 총매출)`, 차감 이동비 = `(올해 차감 - 이동 차감) * 100` (%p 단위)
-- **판가인하 (%)**: `판가인하` 시트 VLOOKUP 연동 (`Col AI` 올해, `Col A` 전년, `Col X` 이동), 연간 판가인하 = `상반기(-1.17%) + 하반기(-15.83%)` = `-17.0%`, 전년비 = `23.0p`
-- **COI / COI(%)**: 시산 매출액 대비 COI 비율 연산 및 전년비 소수점 한자리 표기
-- **MP(%)**: 시산 매출액 대비 MP 비율 및 `전년비` 서브 행 연산
-
-### 3. UI/UX 디자인 및 대시보드 렌더링 규칙 (`index.html`)
-- **사이드바 메인 모듈 구성**:
-  1. **Executive Overview (탭 1)**: 유럽 전체(`EU TTL`) 최상단 포함 및 지표별 선행 점검표 표출
-  2. **법인별 수익성 분석 (탭 2)**: 법인 드롭다운 알파벳 순서 정렬(AG, BN, CK, DG, ES, FS, HS, IS, LA, MK, PL, PT, RO, SW, UK, Swiss), PnL Summary 점검표 및 BLU 세그먼트 분석
-  3. **전략제품 판매 연간 예상 (탭 3)**: OLED (Rows 4~20), MRGB (Rows 24~40), QNED (Rows 44~60) 3개 카드의 연간 예상 판매 분석
-- **레이아웃 & 타이틀 스타일링**:
-  - 상단 컨트롤 헤더 높이(`h-14`) 및 배너 카드 패딩(`px-4 py-2.5`) 50% 슬림화
-  - 모든 점검표 제목 앞 **검은색 세워진 바 포인트 아이콘 (`w-1 h-4 bg-slate-900 rounded-sm`)** 일괄 적용
-  - 불필요한 부제목 영문 구문(`(PnL Table 1)`, `(BLU Table 2)`) 삭제 및 깔끔한 한국어 타이틀 적용
-  - BP/SG비 100% 미만 분홍색 하이라이트(`bg-rose-100`), BP/SG비(Q) 미달 항목 노란색 하이라이트(`bg-amber-300`), ↓/Δ 마이너스 항목 빨간색 강조
+## 1. 개요
+`선행수익성 자료/●261027_TV 10월차 선행 v1.0.xlsb` 원천 파일을 기반으로 유럽 TV 전체(EU) 및 16개 법인·국가(독일·스위스 분리)의 월별/분기별/연간 선행 손익(PnL)과 10대 제품군(BLU) 수익성을 분석하는 대시보드입니다.
 
 ---
 
-## 🛠 실행 및 배포 명령어
+## 2. 데이터 추출 원천 규칙
+| 구분 | 추출 시트 | 대상 조직 | 시트 내 행 범위 (1-based) | 비고 |
+| :--- | :--- | :--- | :--- | :--- |
+| **유럽 Total** | `'지역별'` | `EU` (유럽 Total) | `480 ~ 633` | 유럽 전체 합계 |
+| **독일 / 스위스** | `'국가별'` | `Germany`(독일), `Switzerland`(스위스) | `162 ~ 311`, `8 ~ 159` | `'법인별'` 시트의 `LGEDG`는 스위스 포함이므로 `'국가별'` 시트에서 분리 추출 |
+| **14개 유럽 법인** | `'법인별'` | `LGEUK`, `LGEFS`, `LGEIS`, `LGEES`, `LGEBN`, `LGEPL`, `LGESW`, `LGECK`, `LGEMK`, `LGEAG`, `LGERO`, `LGEPT`, `LGEHS`, `LGELA` | `320 ~ 2657` (각 154행 블록) | `LGEDG(788~941)` 제외 |
 
+---
+
+## 3. 대시보드 3대 탭 구성
+1. **탭 ① 유럽 종합 요약 & 16개 법인·국가 비교 (Executive Scorecard & Ranking)**
+   - 선택 기간(`'26.10월`, `'26.11월`, `'26.12월`, `'26.3Q`, `'26.4Q`, `'26.상/하반기`, `'26.연간`, `'27.1Q`, `'25.연간`) 기준 유럽 Total 6대 KPI 카드 및 `이동비`·`9월차 선행비`·`전년비(YoY)` 동시 표시
+   - 유럽 Total 시계열 추이 차트 및 16개 법인·국가 랭킹 비교 차트/스코어카드 테이블
+2. **탭 ② 조직별 상세 손익(PnL) & 10대 제품군(BLU) 매트릭스**
+   - 17개 조직 선택 전환 및 2가지 컬럼 뷰 토글:
+     - **요약 점검 뷰**: 엑셀 `'요약'` 시트 표준 레이아웃 (`'25년 연간`, `'26.상반기/3Q/10월/11~12월/4Q/연간`, `'27.1Q` + `이동비/9월선행비/전년비/SG비`)
+     - **월별/분기 전체 추이 뷰**: `'25.1Q~'27.1Q` 전체 시계열 (`원값 / 9월차 선행비 / 10월차 이동비 / 전년비 / SG비` 전환)
+   - `[핵심 지표 요약 보기]` ↔ `[전체 세부 행 펼치기 (151행)]` 및 10대 제품군 필터 칩 제공
+3. **탭 ③ 전략제품(OLED·MRGB·QNED·초대형 등) 집중 분석**
+   - 10대 제품군(`OLED`, `UHD`, `MRGB`, `QNED`, `QNED/나노셀`, `일반UHD`, `초대형`, `보급형`, `Life Style`, `FHD`) 포트폴리오 비교 및 전략제품별 16개 법인·국가 크로스 비교 매트릭스
+
+---
+
+## 4. 데이터 빌드 및 배포 방법
 ```powershell
-# 1. 데이터 집계 및 파싱 실행 (RAW 시트 재계산 & advance_profitability_data.json / .js 생성)
-node build_from_source_sheets.js
-
-# 2. 로컬 웹 서버 실행
-node server.js
-
-# 3. Firebase Hosting 운영 배포
-npx --yes firebase-tools deploy --only hosting --project lge-advance-profitability-2026
+Set-Location -LiteralPath 'D:\TV 유럽영업\15. AX Task\2026 AX 실행과제\09. 선행수익성';
+node build_advance_profitability.js;
+firebase deploy --only hosting
 ```
-
----
-
-## 🌐 라이브 웹 배포 서비스 URL
-
-- **메인 파이어베이스 웹 호스팅 URL**: **https://lge-advance-profitability-2026.web.app**
-- **보조 도메인 URL**: **https://lge-advance-profitability-2026.firebaseapp.com**
-- **Firebase 관리 콘솔**: https://console.firebase.google.com/project/lge-advance-profitability-2026/overview

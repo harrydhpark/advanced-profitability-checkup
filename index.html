@@ -1,1009 +1,1628 @@
 <!DOCTYPE html>
-<html class="light" lang="ko">
+<html lang="ko">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Executive Portal | LGE Europe TV Advance Profitability Dashboard</title>
-    <script src="auth-guard.js"></script>
-    <script src="portal-topbar.js"></script>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    
-    <!-- Google Fonts & Material Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    
-    <!-- Preloaded Dashboard Data (Bypasses CORS/file:// restrictions) -->
-    <script src="advance_profitability_data.js?v=20260728_v3"></script>
-
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#051c2c",
-                        "on-primary": "#ffffff",
-                        "secondary": "#a50034",
-                        "surface": "#f6faff",
-                        "surface-variant": "#ebf5ff",
-                        "outline": "#73777d",
-                        "outline-variant": "#c3c7cc",
-                        "error": "#e11d48",
-                        "background": "#ffffff"
-                    },
-                    fontFamily: {
-                        headline: ['"Source Serif 4"', "serif"],
-                        body: ["Inter", "Noto Sans KR", "sans-serif"],
-                        mono: ["JetBrains Mono", "monospace"]
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <style>
-        body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background-color: #f8fafc; color: #0f172a; }
-        h1, h2, h3, h4, h5, h6 { font-family: 'Source Serif 4', serif; }
-        .sidebar-item.active { background-color: rgba(255, 255, 255, 0.12); border-right: 4px solid #a50034; color: #ffffff !important; font-weight: 600; }
-        
-        /* Table Sticky & Premium Executive Excel Styling */
-        .excel-table-container { 
-            overflow-x: auto; 
-            position: relative; 
-            border-radius: 12px; 
-            border: 1px solid #cbd5e1; 
-            background: #ffffff; 
-            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-        }
-        .excel-table { border-collapse: collapse; width: 100%; font-size: 12.5px; font-family: 'JetBrains Mono', monospace; }
-        .excel-table th, .excel-table td { border: 1px solid #cbd5e1; padding: 7px 10px; text-align: right; white-space: nowrap; }
-        .excel-table th { 
-            background-color: #051c2c; 
-            color: #ffffff; 
-            font-family: 'Inter', 'Noto Sans KR', sans-serif; 
-            font-weight: 700; 
-            text-align: center; 
-            padding: 9px 10px;
-            letter-spacing: 0.01em;
-            border-color: #1e3a5f;
-        }
-        .excel-table .sticky-col { position: sticky; left: 0; background-color: #ffffff; z-index: 10; font-weight: 700; text-align: left; border-right: 2px solid #94a3b8; }
-        .excel-table th.sticky-col { background-color: #051c2c !important; color: #ffffff !important; text-align: center; border-right: 2px solid #1e3a5f; }
-        .excel-table tr:hover { background-color: #f8fafc; }
-        .excel-table .bg-summary { background-color: #f1f5f9 !important; }
-        .excel-table th.bg-summary { background-color: #0e2a40 !important; color: #ffffff !important; }
-        
-        /* Tree View & Metric Style Accents */
-        .metric-main-title { font-weight: 700; color: #0f172a; display: inline-flex; items-center; gap: 6px; font-family: 'Inter', 'Noto Sans KR', sans-serif; }
-        .metric-sub-title { font-weight: 400; color: #64748b; padding-left: 14px; display: inline-flex; items-center; gap: 6px; font-family: 'Inter', 'Noto Sans KR', sans-serif; }
-        .cell-sub-val { color: #64748b !important; font-weight: 400 !important; }
-        
-        /* Custom Cell Accents */
-        .text-up { color: #15803d; font-weight: 700; }
-        .text-down { color: #b91c1c; font-weight: 700; }
-        .bg-highlight-yellow { background-color: #fef08a !important; font-weight: 700; color: #854d0e; }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Executive Portal | 2026년 10월차 TV 선행 수익성 분석 대시보드</title>
+  <script src="auth-guard.js"></script>
+  <script src="portal-topbar.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <script src="advance_profitability_data.js"></script>
+  <style>
+    :root {
+      --bg-primary: #F8FAFC;
+      --surface: #FFFFFF;
+      --slate-900: #0F172A;
+      --slate-700: #334155;
+      --slate-500: #64748B;
+      --teal-600: #0D9488;
+      --blue-500: #3B82F6;
+      --border: #E2E8F0;
+    }
+    body {
+      background-color: var(--bg-primary);
+      color: var(--slate-900);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    h1, h2, h3, .font-heading {
+      font-family: 'IBM Plex Sans', 'Inter', sans-serif;
+    }
+    .num-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+    /* Custom Sticky Table Styles */
+    .table-container {
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 76vh;
+      border: 1px solid #E2E8F0;
+      border-radius: 0.5rem;
+      background: #FFFFFF;
+    }
+    table.matrix-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12px;
+    }
+    table.matrix-table th,
+    table.matrix-table td {
+      border-right: 1px solid #E2E8F0;
+      border-bottom: 1px solid #E2E8F0;
+      padding: 6px 8px;
+      white-space: nowrap;
+    }
+    table.matrix-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: #0F172A;
+      color: #F8FAFC;
+      font-weight: 600;
+      text-align: center;
+    }
+    table.matrix-table thead tr:nth-child(2) th {
+      top: 31px;
+      z-index: 20;
+    }
+    table.matrix-table .sticky-col-1 {
+      position: sticky;
+      left: 0;
+      z-index: 15;
+      background: #FFFFFF;
+    }
+    table.matrix-table .sticky-col-2 {
+      position: sticky;
+      left: 110px;
+      z-index: 15;
+      background: #FFFFFF;
+      box-shadow: 2px 0 5px -2px rgba(15, 23, 42, 0.12);
+    }
+    table.matrix-table thead .sticky-col-1,
+    table.matrix-table thead .sticky-col-2 {
+      z-index: 30;
+      background: #0F172A;
+    }
+    table.matrix-table tbody tr:hover td {
+      background-color: #F1F5F9 !important;
+    }
+    table.matrix-table tbody tr.row-highlight td {
+      background-color: #F8FAFC;
+      font-weight: 600;
+    }
+    table.matrix-table tbody tr.row-eu-total td {
+      background-color: #F0FDFA;
+      font-weight: 700;
+      border-bottom: 2px solid #0D9488;
+    }
+    table.matrix-table tbody tr.row-section-hdr td {
+      background-color: #E2E8F0;
+      color: #0F172A;
+      font-weight: 700;
+    }
+    .val-pos { color: #059669; }
+    .val-neg { color: #DC2626; }
+    .val-zero { color: #94A3B8; }
+    .col-forecast {
+      background-color: #F0F9FF;
+    }
+    .col-var {
+      background-color: #FAFAFA;
+      font-size: 11.5px;
+    }
+    .tab-btn-active {
+      background-color: #0F172A;
+      color: #FFFFFF;
+      border-color: #0F172A;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+    }
+    .tab-btn-inactive {
+      background-color: #FFFFFF;
+      color: #475569;
+      border-color: #CBD5E1;
+    }
+    .tab-btn-inactive:hover {
+      background-color: #F1F5F9;
+      color: #0F172A;
+    }
+    .chip-active {
+      background-color: #0D9488;
+      color: #FFFFFF;
+      border-color: #0D9488;
+    }
+    .chip-inactive {
+      background-color: #FFFFFF;
+      color: #475569;
+      border-color: #CBD5E1;
+    }
+    .chip-inactive:hover {
+      border-color: #0D9488;
+      color: #0F172A;
+    }
+  </style>
 </head>
-<body class="flex min-h-screen">
+<body class="min-h-screen flex flex-col">
 
-    <!-- ==================== LEFT FIXED SIDEBAR ==================== -->
-    <aside class="w-72 bg-primary text-white fixed h-screen flex flex-col z-50 shadow-xl">
-        <!-- Logo & Header -->
-        <div class="p-6 border-b border-white/10 flex-shrink-0">
-            <div class="flex items-center gap-3 mb-1.5">
-                <div class="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-white font-bold text-lg shadow-inner">
-                    TV
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight text-white leading-none">선행수익성 Portal</h1>
-                    <span class="text-[10px] text-white/50 tracking-wider font-mono">LGE Europe TV AX Task</span>
-                </div>
-            </div>
-            <p class="text-[11px] text-white/60 font-medium mt-2">2026년 7월차 선행수익성 분석 대시보드</p>
+  <!-- Dashboard Header Bar -->
+  <header class="bg-white border-b border-slate-200 px-6 py-4 shadow-xs">
+    <div class="max-w-[1800px] mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2.5">
+          <span class="px-2.5 py-0.5 rounded-sm text-xs font-bold bg-slate-900 text-white tracking-wide uppercase">09. Advance Profitability</span>
+          <span class="px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200">2026년 10월차 선행 v1.0</span>
+          <span class="text-xs text-slate-500 num-mono">원천: ●261027_TV 10월차 선행 v1.0.xlsb</span>
         </div>
-        
-        <!-- Navigation Menu -->
-        <nav class="flex-1 py-4 space-y-1 overflow-y-auto px-3" id="sidebar-nav">
-            <div class="px-3 py-2 text-[10px] font-bold text-white/40 uppercase tracking-widest">Main Modules</div>
-            
-            <button onclick="switchTab('tab-overview')" id="nav-tab-overview" class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs text-white/80 hover:bg-white/10 transition-all text-left">
-                <span class="material-symbols-outlined text-base">dashboard</span>
-                <span>Executive Overview</span>
-            </button>
-            
-            <button onclick="switchTab('tab-subsidiary')" id="nav-tab-subsidiary" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs text-white/80 hover:bg-white/10 transition-all text-left">
-                <span class="material-symbols-outlined text-base">domain</span>
-                <span>법인별 수익성 분석</span>
-            </button>
-            
-            <button onclick="switchTab('tab-strategic')" id="nav-tab-strategic" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs text-white/80 hover:bg-white/10 transition-all text-left">
-                <span class="material-symbols-outlined text-base">ads_click</span>
-                <span>전략제품 판매 연간 예상</span>
-            </button>
-            
-        </nav>
-        
-        <!-- User Footer -->
-        <div class="p-6 border-t border-white/10 bg-black/20 flex flex-col gap-1 text-[11px] text-white/50 flex-shrink-0">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-sm text-secondary">admin_panel_settings</span>
-                <p class="font-bold text-white/80">System Admin</p>
-            </div>
-            <p class="text-white/70">Harry Park (유럽영업)</p>
-            <p><a href="mailto:harry.park@lge.com" class="hover:text-white text-white/50 underline transition-all">harry.park@lge.com</a></p>
+        <h1 class="text-xl font-bold text-slate-900 mt-1 tracking-tight">유럽 TV 선행 수익성 점검 대시보드 (Advance Profitability Analysis)</h1>
+      </div>
+
+      <!-- Actions & Main 3-Tab Navigation -->
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Excel Download Button (KPI Sheet Style) -->
+        <a href="261027_TV_10month_Advance_v1.0.xlsb" download="●261027_TV 10월차 선행 v1.0.xlsb"
+           class="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold rounded-md shadow-xs hover:shadow transition-all duration-200 cursor-pointer shrink-0 group"
+           title="●261027_TV 10월차 선행 v1.0.xlsb 원본 파일 다운로드 (용량: 94.6MB)">
+          <svg class="w-4 h-4 text-emerald-100 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/>
+            <path d="M8 12h2.5l1.5 2.5 1.5-2.5H16l-2.5 4 2.5 4h-2.5l-1.5-2.5-1.5 2.5H8l2.5-4z"/>
+          </svg>
+          <span>Excel 다운로드 (.xlsb)</span>
+          <span class="text-[10px] font-normal text-emerald-200 num-mono bg-emerald-800/60 px-1.5 py-0.5 rounded">94.6MB</span>
+          <svg class="w-3.5 h-3.5 text-emerald-200 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+          </svg>
+        </a>
+
+        <!-- Main 3-Tab Navigation -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="main-tab-1" onclick="switchMainTab(1)" class="px-4 py-2 rounded-md text-xs font-semibold border transition flex items-center gap-1.5 tab-btn-active">
+            <i class="ri-bar-chart-grouped-line text-sm"></i>
+            <span>① 유럽 종합 요약 & 16개 법인·국가 비교</span>
+          </button>
+          <button id="main-tab-2" onclick="switchMainTab(2)" class="px-4 py-2 rounded-md text-xs font-semibold border transition flex items-center gap-1.5 tab-btn-inactive">
+            <i class="ri-table-2 text-sm"></i>
+            <span>② 조직별 상세 손익(PnL) & 10대 제품군 매트릭스</span>
+          </button>
+          <button id="main-tab-3" onclick="switchMainTab(3)" class="px-4 py-2 rounded-md text-xs font-semibold border transition flex items-center gap-1.5 tab-btn-inactive">
+            <i class="ri-focus-3-line text-sm"></i>
+            <span>③ 전략제품(OLED·MRGB·QNED·초대형) 집중 분석</span>
+          </button>
         </div>
-    </aside>
+      </div>
+    </div>
+  </header>
 
-    <!-- ==================== MAIN CONTENT CANVAS ==================== -->
-    <main class="ml-72 flex-1 flex flex-col min-h-screen min-w-0 bg-slate-50">
-        
-        <!-- Top Sticky Control Header Bar -->
-        <header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <span class="text-xs font-bold tracking-widest text-slate-400 uppercase">Europe TV Insight</span>
-                <div class="h-4 w-px bg-slate-200"></div>
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-secondary text-lg">insights</span>
-                    <h2 class="text-base font-bold text-primary" id="page-title">Executive Overview</h2>
-                </div>
-            </div>
-            
-            <!-- Global Interactive Filters -->
-            <div class="flex items-center gap-3">
-                <!-- Selector 1: Metric Selector (Overview) OR Entity Selector (Subsidiary) -->
-                <div id="container-metric-filter" class="flex items-center gap-2 bg-slate-50 border border-slate-300 px-3 py-1.5 rounded-xl shadow-sm hover:border-slate-400 transition-all">
-                    <span class="material-symbols-outlined text-sm text-slate-500">analytics</span>
-                    <span class="text-xs font-bold text-slate-600">지표 선택:</span>
-                    <select id="filter-metric" onchange="applyGlobalFilters()" class="bg-transparent text-xs font-bold text-primary focus:outline-none cursor-pointer">
-                        <option value="제상품">제상품</option>
-                        <option value="차감">차감</option>
-                        <option value="판가인하">판가인하</option>
-                        <option value="영업이익">영업이익</option>
-                        <option value="영업이익율">영업이익율</option>
-                        <option value="한계이익율">한계이익율</option>
-                    </select>
-                </div>
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-[1800px] w-full mx-auto px-6 py-4 space-y-4">
 
-                <div id="container-sub-filter" class="hidden flex items-center gap-2 bg-slate-50 border border-slate-300 px-3 py-1.5 rounded-xl shadow-sm hover:border-slate-400 transition-all">
-                    <span class="material-symbols-outlined text-sm text-slate-500">apartment</span>
-                    <span class="text-xs font-bold text-slate-600">법인/지점 선택:</span>
-                    <select id="filter-sub" onchange="applyGlobalFilters()" class="bg-transparent text-xs font-bold text-primary focus:outline-none cursor-pointer">
-                        <option value="LGEAG">LGEAG (오스트리아)</option>
-                        <option value="LGEBN">LGEBN (베네룩스)</option>
-                        <option value="LGECK">LGECK (체코)</option>
-                        <option value="LGEDG" selected>LGEDG (독일)</option>
-                        <option value="LGEES">LGEES (스페인)</option>
-                        <option value="LGEFS">LGEFS (프랑스)</option>
-                        <option value="LGEHS">LGEHS (그리스)</option>
-                        <option value="LGEIS">LGEIS (이탈리아)</option>
-                        <option value="LGELA">LGELA (발틱)</option>
-                        <option value="LGEMK">LGEMK (헝가리)</option>
-                        <option value="LGEPL">LGEPL (폴란드)</option>
-                        <option value="LGEPT">LGEPT (포르투갈)</option>
-                        <option value="LGERO">LGERO (루마니아)</option>
-                        <option value="LGESW">LGESW (스웨덴)</option>
-                        <option value="LGEUK">LGEUK (영국)</option>
-                        <option value="Swiss">Swiss (스위스)</option>
-                    </select>
-                </div>
+    <!-- POC Info Banner -->
+    <div class="bg-slate-100/90 border border-slate-200 rounded-md px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+      <div class="flex items-center gap-2">
+        <span class="font-semibold text-slate-800">💡 데이터 원천 규칙 안내 —</span>
+        <span>본 대시보드는 <strong class="text-slate-900">'●261027_TV 10월차 선행 v1.0.xlsb'</strong> 사전 연산 시트를 100% 무손실 추출합니다:</span>
+        <span class="inline-flex items-center px-2 py-0.5 rounded bg-slate-900 text-white font-medium text-[11px]">유럽 Total: '지역별' 시트</span>
+        <span class="inline-flex items-center px-2 py-0.5 rounded bg-teal-700 text-white font-medium text-[11px]">독일·스위스: '국가별' 시트</span>
+        <span class="inline-flex items-center px-2 py-0.5 rounded bg-blue-700 text-white font-medium text-[11px]">그 외 14개 법인: '법인별' 시트 (LGEDG 스위스포함 제외)</span>
+      </div>
+      <div class="text-[11px] text-slate-500 num-mono">단위: 수량(천대, K) / 금액(백만불, $M) / ASP($/대) / 비율(%, %p)</div>
+    </div>
 
-                <!-- Reset Button -->
-                <button onclick="resetFilters()" class="p-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-600 transition-all shadow-sm flex items-center justify-center" title="필터 초기화">
-                    <span class="material-symbols-outlined text-sm">restart_alt</span>
-                </button>
-            </div>
-        </header>
+    <!-- =================================================================== -->
+    <!-- TAB 1: 유럽 종합 요약 및 16개 법인·국가 비교 (Scorecard & Ranking)    -->
+    <!-- =================================================================== -->
+    <section id="tab-panel-1" class="space-y-4">
 
-        <!-- Main Dashboard View Container -->
-        <div class="p-5 space-y-3.5 flex-1 flex flex-col min-h-0 overflow-y-auto">
-
-            <!-- ==================== TAB 1: EXECUTIVE OVERVIEW ==================== -->
-            <div id="tab-overview" class="tab-content space-y-3">
-                <div class="flex items-center justify-between bg-white px-4 py-2.5 rounded-xl border border-slate-200/80 shadow-sm">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-1 h-4 bg-slate-900 rounded-sm"></span>
-                        <h3 class="text-sm font-bold text-primary font-headline" id="overview-table-title">법인별 선행 점검표</h3>
-                    </div>
-                    <div class="flex items-center gap-4 text-xs text-slate-600 font-medium">
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> 초록: 전년비 증가/이동비 개선(↑)</span>
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> 빨간: 전년비 감소/이동비 악화(↓/Δ)</span>
-                        <span class="font-mono text-slate-400 border-l border-slate-200 pl-3">출처: 엑셀 '법인별' 시트 100% 동일</span>
-                    </div>
-                </div>
-
-                <div class="excel-table-container bg-white p-3 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
-                    <table class="excel-table w-full text-xs" id="table-overview-metric"></table>
-                </div>
-            </div>
-
-            <!-- ==================== TAB 2: SUBSIDIARY PROFITABILITY ==================== -->
-            <div id="tab-subsidiary" class="tab-content space-y-3.5 hidden">
-                <!-- Info Header Banner Card -->
-                <div class="flex items-center justify-between bg-white px-4 py-2.5 rounded-xl border border-slate-200/80 shadow-sm">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-1 h-4 bg-slate-900 rounded-sm"></span>
-                        <h3 class="text-sm font-bold text-primary font-headline" id="subsidiary-table-title">법인별 손익 Summary 점검표</h3>
-                    </div>
-                    <div class="flex items-center gap-4 text-xs text-slate-500 font-medium">
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> 빨간: Δ 감소/악화</span>
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> 초록: ↑/전년비 개선</span>
-                        <span class="border-l border-slate-200 pl-3 font-mono text-slate-400">단위: 수량(천대), 금액(백만유로)</span>
-                    </div>
-                </div>
-
-                <!-- Table 1 Container: PnL Summary (Image 1 Format) -->
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
-                    <table class="excel-table w-full text-xs" id="table-pnl-excel"></table>
-                </div>
-
-                <!-- Section Divider -->
-                <div class="flex items-center justify-between pt-2">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-1 h-4 bg-slate-900 rounded-sm"></span>
-                        <h3 class="text-base font-bold text-primary font-headline">BLU 세그먼트별 수량 & COI% 분석</h3>
-                    </div>
-                </div>
-
-                <!-- Table 2 Container: BLU Segment Summary (Image 2 Format) -->
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
-                    <table class="excel-table w-full text-xs" id="table-blu-excel"></table>
-                </div>
-            </div>
-
-            <!-- ==================== TAB 3: STRATEGIC PRODUCTS SALES YEARLY FORECAST ==================== -->
-            <div id="tab-strategic" class="tab-content space-y-4 hidden">
-                <!-- Info Header Banner Card -->
-                <div class="flex items-center justify-between bg-white px-4 py-2.5 rounded-xl border border-slate-200/80 shadow-sm">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-1 h-4 bg-slate-900 rounded-sm"></span>
-                        <h3 class="text-sm font-bold text-primary font-headline">전략제품 판매 연간 예상 점검표 (OLED / MRGB / QNED)</h3>
-                    </div>
-                    <div class="flex items-center gap-4 text-xs text-slate-500 font-medium">
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-200 border border-rose-400"></span> 분홍: BP/SG비 100% 미만</span>
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-300 border border-amber-400"></span> 노랑: BP/SG비(Q) 미달 하이라이트</span>
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> 빨간: Δ 차감/감소/이동비 악화(↓)</span>
-                        <span class="border-l border-slate-200 pl-3 font-mono text-slate-400">출처: 엑셀 '전략제품' 시트 100% 동일 매핑</span>
-                    </div>
-                </div>
-
-                <!-- 3 Tables Side-by-Side Grid -->
-                <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
-                    <!-- OLED Table Card -->
-                    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
-                        <div class="flex items-center justify-between mb-2.5 border-b border-slate-200 pb-2">
-                            <span class="font-bold text-xs text-primary flex items-center gap-2">
-                                <span class="w-1 h-3.5 bg-slate-900 rounded-sm"></span> OLED 판매 연간 예상
-                            </span>
-                            <span class="text-[10px] font-mono text-slate-400">단위: 수량(천대), %</span>
-                        </div>
-                        <table class="excel-table w-full text-xs" id="table-strategic-oled"></table>
-                    </div>
-
-                    <!-- MRGB Table Card -->
-                    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
-                        <div class="flex items-center justify-between mb-2.5 border-b border-slate-200 pb-2">
-                            <span class="font-bold text-xs text-primary flex items-center gap-2">
-                                <span class="w-1 h-3.5 bg-slate-900 rounded-sm"></span> MRGB 판매 연간 예상
-                            </span>
-                            <span class="text-[10px] font-mono text-slate-400">단위: 수량(천대), %</span>
-                        </div>
-                        <table class="excel-table w-full text-xs" id="table-strategic-mrgb"></table>
-                    </div>
-
-                    <!-- QNED Table Card -->
-                    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
-                        <div class="flex items-center justify-between mb-2.5 border-b border-slate-200 pb-2">
-                            <span class="font-bold text-xs text-primary flex items-center gap-2">
-                                <span class="w-1 h-3.5 bg-slate-900 rounded-sm"></span> QNED 판매 연간 예상
-                            </span>
-                            <span class="text-[10px] font-mono text-slate-400">단위: 수량(천대), %</span>
-                        </div>
-                        <table class="excel-table w-full text-xs" id="table-strategic-qned"></table>
-                    </div>
-                </div>
-            </div>
-
+      <!-- Period Selector Bar -->
+      <div class="bg-white border border-slate-200 rounded-lg p-3.5 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-bold text-slate-800 flex items-center">
+            <span class="w-1 h-4 bg-slate-900 rounded-sm inline-block mr-2"></span>점검 기준 기간:
+          </span>
+          <div id="tab1-period-chips" class="flex flex-wrap gap-1.5"></div>
         </div>
-    </main>
+        <div class="flex items-center gap-2 text-xs">
+          <span class="text-slate-500">비교 기준 표시:</span>
+          <label class="inline-flex items-center gap-1 cursor-pointer font-medium text-slate-700">
+            <input type="checkbox" id="t1-show-mp" checked onchange="renderTab1()" class="rounded text-teal-600"> 10월차 이동비
+          </label>
+          <label class="inline-flex items-center gap-1 cursor-pointer font-medium text-slate-700">
+            <input type="checkbox" id="t1-show-prev" checked onchange="renderTab1()" class="rounded text-teal-600"> 9월차 선행비
+          </label>
+          <label class="inline-flex items-center gap-1 cursor-pointer font-medium text-slate-700">
+            <input type="checkbox" id="t1-show-yoy" checked onchange="renderTab1()" class="rounded text-teal-600"> 전년비(YoY)
+          </label>
+        </div>
+      </div>
 
-    <!-- Script Application Logic -->
-    <script>
-        let dashboardData = null;
-        let activeTab = 'tab-overview';
+      <!-- 6 Executive KPI Cards for Europe Total (EU) -->
+      <div id="tab1-kpi-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3"></div>
 
-        // Initialize Application
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadData();
-            renderDashboard();
+      <!-- Charts Row (2 Columns) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Left Chart: EU Time-Series Trend -->
+        <div class="lg:col-span-6 bg-white border border-slate-200 rounded-lg p-4 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-bold text-slate-900 flex items-center">
+              <span class="w-1 h-4 bg-slate-900 rounded-sm inline-block mr-2"></span>유럽 Total (EU) 매출 및 수익성 시계열 추이 (실적◁ vs ▶선행)
+            </h2>
+            <div class="flex items-center gap-1">
+              <button id="t1-chart-mode-m" onclick="setTab1ChartMode('monthly')" class="px-2.5 py-1 rounded text-[11px] font-semibold border chip-active">26.1월~27.3월(월별)</button>
+              <button id="t1-chart-mode-q" onclick="setTab1ChartMode('quarterly')" class="px-2.5 py-1 rounded text-[11px] font-semibold border chip-inactive">25.1Q~27.1Q(분기별)</button>
+            </div>
+          </div>
+          <div class="h-[270px]">
+            <canvas id="chart-eu-trend"></canvas>
+          </div>
+        </div>
+
+        <!-- Right Chart: 16 Subsidiaries/Countries Ranking -->
+        <div class="lg:col-span-6 bg-white border border-slate-200 rounded-lg p-4 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-bold text-slate-900 flex items-center">
+              <span class="w-1 h-4 bg-slate-900 rounded-sm inline-block mr-2"></span>16개 법인·국가별 핵심 지표 비교 (<span id="t1-chart2-period-label" class="text-teal-700"></span>)
+            </h2>
+            <select id="t1-chart2-metric" onchange="renderTab1Charts()" class="border border-slate-300 rounded px-2 py-1 text-xs font-medium text-slate-800 bg-white">
+              <option value="nSales_coiRate">N.매출 ($M) & 영업이익률 (COI%)</option>
+              <option value="coi_varPrev">영업이익 COI ($M) & 9월차 선행비 ($M)</option>
+              <option value="mp_mpRate">한계이익 MP ($M) & 한계이익률 (MP%)</option>
+              <option value="qty_asp">판매 수량 (K) & ASP ($/대)</option>
+            </select>
+          </div>
+          <div class="h-[270px]">
+            <canvas id="chart-sub-ranking"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- 16 Subsidiaries & Countries Scorecard Table -->
+      <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-xs space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-slate-900 flex items-center">
+              <span class="w-1 h-4 bg-slate-900 rounded-sm inline-block mr-2"></span>유럽 Total 및 16개 법인·국가 종합 손익 점검표 (<span id="t1-table-period-label" class="text-teal-700"></span>)
+            </h2>
+            <span class="text-xs text-slate-500">※ 조직명을 클릭하면 탭② 상세 손익 & 제품군 매트릭스로 이동합니다.</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="exportTableToCSV('tab1-scorecard-table', '선행수익성_16개법인국가_종합비교.csv')" class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1">
+              <i class="ri-download-2-line"></i> CSV 다운로드
+            </button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="tab1-scorecard-table" class="matrix-table"></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 2: 조직별 상세 손익(PnL) 및 10대 제품군(BLU) 매트릭스             -->
+    <!-- =================================================================== -->
+    <section id="tab-panel-2" class="space-y-4 hidden">
+
+      <!-- Organization & View Mode Control Bar -->
+      <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-xs space-y-3">
+        <!-- Row 1: Entity Selector Chips -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <span class="text-xs font-bold text-slate-800 flex items-center mr-1">
+            <span class="w-1 h-4 bg-slate-900 rounded-sm inline-block mr-2"></span>대상 조직 선택:
+          </span>
+          <div id="tab2-entity-chips" class="flex flex-wrap gap-1"></div>
+        </div>
+
+        <hr class="border-slate-200" />
+
+        <!-- Row 2: Column View Mode + Variance Toggles + Row Density -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <!-- Column View Toggle -->
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-semibold text-slate-700">시계열 컬럼 뷰:</span>
+            <div class="inline-flex rounded-md shadow-2xs" role="group">
+              <button id="t2-colmode-summary" onclick="setTab2ColMode('summary')" class="px-3 py-1.5 text-xs font-semibold border rounded-l-md chip-active">
+                ① 요약 점검 뷰 (엑셀 '요약' 시트 표준)
+              </button>
+              <button id="t2-colmode-monthly" onclick="setTab2ColMode('monthly')" class="px-3 py-1.5 text-xs font-semibold border rounded-r-md chip-inactive">
+                ② 월별/분기 전체 추이 뷰 ('25.1Q~'27.1Q)
+              </button>
+            </div>
+
+            <!-- Sub-controls for Summary View -->
+            <div id="t2-summary-var-controls" class="flex items-center gap-2.5 ml-2 bg-slate-50 px-3 py-1 rounded border border-slate-200 text-xs">
+              <span class="font-semibold text-slate-600">비교열 표시:</span>
+              <label class="inline-flex items-center gap-1 cursor-pointer">
+                <input type="checkbox" id="t2-var-mp" checked onchange="renderTab2()" class="rounded text-teal-600"> 10월차 이동비
+              </label>
+              <label class="inline-flex items-center gap-1 cursor-pointer">
+                <input type="checkbox" id="t2-var-prev" checked onchange="renderTab2()" class="rounded text-teal-600"> 9월차 선행비
+              </label>
+              <label class="inline-flex items-center gap-1 cursor-pointer">
+                <input type="checkbox" id="t2-var-yoy" checked onchange="renderTab2()" class="rounded text-teal-600"> 전년비(YoY)
+              </label>
+              <label class="inline-flex items-center gap-1 cursor-pointer">
+                <input type="checkbox" id="t2-var-sg" onchange="renderTab2()" class="rounded text-teal-600"> SG비
+              </label>
+            </div>
+
+            <!-- Sub-controls for Monthly View -->
+            <div id="t2-monthly-val-controls" class="hidden flex items-center gap-2 ml-2 bg-slate-50 px-3 py-1 rounded border border-slate-200 text-xs">
+              <span class="font-semibold text-slate-600">표시 데이터:</span>
+              <select id="t2-monthly-valtype" onchange="renderTab2()" class="border border-slate-300 rounded px-2 py-0.5 text-xs font-semibold bg-white">
+                <option value="val">실적 / 10월차 선행 원값</option>
+                <option value="varPrev">9월차 선행비 (전월 선행 대비 증감)</option>
+                <option value="varMp">10월차 이동비 (이동계획 대비 증감)</option>
+                <option value="yoy">전년비 (YoY 증감률/증감폭)</option>
+                <option value="varSg">SG비 (SG 목표 대비 증감)</option>
+              </select>
+              <label class="inline-flex items-center gap-1 cursor-pointer ml-2">
+                <input type="checkbox" id="t2-monthly-show25" checked onchange="renderTab2()" class="rounded text-teal-600"> '25년 분기/연간 포함
+              </label>
+            </div>
+          </div>
+
+          <!-- Row Density & Export -->
+          <div class="flex items-center gap-2">
+            <div class="inline-flex rounded-md" role="group">
+              <button id="t2-rowmode-core" onclick="setTab2RowMode('core')" class="px-3 py-1.5 text-xs font-semibold border rounded-l-md chip-active">
+                핵심 지표 요약 보기
+              </button>
+              <button id="t2-rowmode-all" onclick="setTab2RowMode('all')" class="px-3 py-1.5 text-xs font-semibold border rounded-r-md chip-inactive">
+                전체 세부 행 펼치기 (151행)
+              </button>
+            </div>
+            <button onclick="exportTableToCSV('tab2-matrix-table', '선행수익성_상세손익매트릭스.csv')" class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1">
+              <i class="ri-download-2-line"></i> CSV 다운로드
+            </button>
+          </div>
+        </div>
+
+        <!-- Row 3: Product Group (BLU) Filter Chips -->
+        <div class="flex flex-wrap items-center gap-1.5 pt-1">
+          <span class="text-xs font-semibold text-slate-600 mr-1">섹션/제품군 필터:</span>
+          <div id="tab2-segment-chips" class="flex flex-wrap gap-1"></div>
+        </div>
+      </div>
+
+      <!-- Matrix Table Header Info & Container -->
+      <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-xs space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <h2 id="tab2-table-title" class="text-sm font-bold text-slate-900 flex items-center"></h2>
+            <span id="tab2-source-badge" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-300 num-mono"></span>
+          </div>
+          <div class="text-xs text-slate-500">
+            <span class="inline-block w-2.5 h-2.5 bg-sky-50 border border-sky-200 mr-1 align-middle"></span>하늘색 음영 열은 <strong>10월차 ▶선행 전망 구간('26.10월~'27.1Q)</strong>입니다.
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="tab2-matrix-table" class="matrix-table"></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 3: 전략제품(OLED / MRGB / QNED / 초대형 등) 집중 분석             -->
+    <!-- =================================================================== -->
+    <section id="tab-panel-3" class="space-y-4 hidden">
+
+      <!-- Tab 3 Filter Bar -->
+      <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="text-xs font-bold text-slate-800 flex items-center">
+            <span class="w-1 h-4 bg-slate-900 rounded-sm inline-block mr-2"></span>분석 기준 기간:
+          </span>
+          <div id="tab3-period-chips" class="flex flex-wrap gap-1.5"></div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-bold text-slate-800">포트폴리오 기준 조직:</span>
+          <select id="tab3-entity-select" onchange="renderTab3()" class="border border-slate-300 rounded px-2.5 py-1.5 text-xs font-semibold text-slate-800 bg-white"></select>
+        </div>
+      </div>
+
+      <!-- Section 3-A: 10 Product Segments Portfolio Comparison (Selected Entity) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div class="lg:col-span-5 bg-white border border-slate-200 rounded-lg p-4 shadow-xs">
+          <h2 class="text-sm font-bold text-slate-900 flex items-center mb-3">
+            <span class="w-1 h-4 bg-slate-900 rounded-sm inline-block mr-2"></span>10대 제품군별 N.매출 및 수익성(COI% / MP%) 비교 (<span id="t3-chart-ent-label" class="text-teal-700"></span>)
+          </h2>
+          <div class="h-[300px]">
+            <canvas id="chart-seg-portfolio"></canvas>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 bg-white border border-slate-200 rounded-lg p-4 shadow-xs space-y-2">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold text-slate-900 flex items-center">
+              <span class="w-1 h-4 bg-slate-900 rounded-sm inline-block mr-2"></span>10대 제품군(BLU)별 손익 및 증감 요약표 (<span id="t3-portfolio-title" class="text-teal-700"></span>)
+            </h2>
+            <span class="text-[11px] text-slate-500">※ 제품군 행 클릭 시 하단 16개 법인·국가 크로스 비교가 전환됩니다.</span>
+          </div>
+          <div class="table-container" style="max-height: 310px;">
+            <table id="tab3-portfolio-table" class="matrix-table"></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3-B: Selected Strategic Segment x 16 Subsidiaries/Countries Matrix -->
+      <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-xs space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="text-sm font-bold text-slate-900 flex items-center">
+              <span class="w-1 h-4 bg-slate-900 rounded-sm inline-block mr-2"></span>제품군별 16개 법인·국가 크로스 손익 비교:
+            </h2>
+            <div id="tab3-seg-selector-chips" class="flex flex-wrap gap-1"></div>
+          </div>
+          <button onclick="exportTableToCSV('tab3-cross-table', '선행수익성_전략제품_법인별비교.csv')" class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1">
+            <i class="ri-download-2-line"></i> CSV 다운로드
+          </button>
+        </div>
+        <div class="table-container">
+          <table id="tab3-cross-table" class="matrix-table"></table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // =========================================================================
+    // Global State & Constants
+    // =========================================================================
+    const DB = window.ADVANCE_PROFITABILITY_DATA;
+    const ENTITIES = DB.schemas.entities;
+    const PNL_METRICS = DB.schemas.pnlMetrics;
+    const SEGMENTS = DB.schemas.segments;
+    const SEGMENT_METRICS = DB.schemas.segmentMetrics;
+
+    const PERIOD_OPTIONS = [
+      { id: 'y26_m10', label: "'26.10월 (▶선행)", short: "'26.10월", mpKey: 'varMp_m10', prevKey: 'varPrev_m10', yoyKey: 'y26_m10_yoy', sgKey: 'varSg_m10', isForecast: true },
+      { id: 'y26_m11', label: "'26.11월 (▶선행)", short: "'26.11월", mpKey: 'varMp_m11', prevKey: 'varPrev_m11', yoyKey: 'y26_m11_yoy', sgKey: 'varSg_m11', isForecast: true },
+      { id: 'y26_m12', label: "'26.12월 (▶선행)", short: "'26.12월", mpKey: 'varMp_m12', prevKey: 'varPrev_m12', yoyKey: 'y26_m12_yoy', sgKey: 'varSg_m12', isForecast: true },
+      { id: 'y26_q3',  label: "'26.3분기 (실적◁)", short: "'26.3분기", mpKey: 'varMp_q3',  prevKey: 'varPrev_q3',  yoyKey: 'y26_q3_yoy',  sgKey: 'varSg_q3',  isForecast: false },
+      { id: 'y26_q4',  label: "'26.4분기 (▶선행)", short: "'26.4분기", mpKey: 'varMp_q4',  prevKey: 'varPrev_q4',  yoyKey: 'y26_q4_yoy',  sgKey: 'varSg_q4',  isForecast: true },
+      { id: 'y26_h1',  label: "'26.상반기 (실적◁)", short: "'26.상반기", mpKey: null,       prevKey: null,         yoyKey: 'y26_h1_yoy',  sgKey: 'varSg_h1',  isForecast: false },
+      { id: 'y26_h2',  label: "'26.하반기 (▶선행)", short: "'26.하반기", mpKey: 'varMp_h2',  prevKey: 'varPrev_h2',  yoyKey: 'y26_h2_yoy',  sgKey: 'varSg_h2',  isForecast: true },
+      { id: 'y26_yr',  label: "'26년 연간 (▶선행)", short: "'26년 연간", mpKey: 'varMp_yr',  prevKey: 'varPrev_yr',  yoyKey: 'y26_yr_yoy',  sgKey: 'varSg_yr',  isForecast: true },
+      { id: 'y27_q1',  label: "'27.1분기 (▶선행)", short: "'27.1분기", mpKey: null,       prevKey: 'varPrev_y27_q1', yoyKey: 'y27_q1_yoy', sgKey: null,       isForecast: true },
+      { id: 'y25_yr',  label: "'25년 연간 (실적)",  short: "'25년 연간", mpKey: null,       prevKey: null,         yoyKey: 'y25_yr_yoy',  sgKey: null,       isForecast: false }
+    ];
+
+    let state = {
+      activeTab: 1,
+      tab1Period: 'y26_yr',
+      tab1ChartMode: 'monthly',
+      tab2Entity: 'EU',
+      tab2ColMode: 'summary', // 'summary' | 'monthly'
+      tab2RowMode: 'core',    // 'core' | 'all'
+      tab2SegmentFilter: 'ALL', // 'ALL' | 'PNL_ONLY' | segmentId
+      tab3Period: 'y26_yr',
+      tab3Entity: 'EU',
+      tab3Segment: 'OLED'
+    };
+
+    let chartEuTrendInstance = null;
+    let chartSubRankingInstance = null;
+    let chartSegPortfolioInstance = null;
+
+    // =========================================================================
+    // Formatting Helpers
+    // =========================================================================
+    function fmtVal(v, format) {
+      if (v === null || v === undefined || Number.isNaN(v)) return '<span class="val-zero">-</span>';
+      const n = Number(v);
+      if (format === 'pct') {
+        const pct = n * 100;
+        if (Math.abs(pct) < 0.005) return '<span class="val-zero">0.0%</span>';
+        const cls = pct < 0 ? 'val-neg' : '';
+        return `<span class="${cls}">${pct.toFixed(1)}%</span>`;
+      }
+      if (format === 'asp') {
+        if (Math.abs(n) < 0.05) return '<span class="val-zero">-</span>';
+        return Math.round(n).toLocaleString('en-US');
+      }
+      if (format === 'qty' || format === 'amt') {
+        if (Math.abs(n) < 0.005) return '<span class="val-zero">0.0</span>';
+        const cls = n < 0 ? 'val-neg' : '';
+        return `<span class="${cls}">${n.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>`;
+      }
+      return n.toFixed(1);
+    }
+
+    // Format Variance / YoY cell
+    // isYoYRate: true when metric.yoyMode === 'rate' AND column is a YoY column
+    // invertColor: true for cost/deduction metrics where positive increase is unfavorable (optional, keep standard +green/-red for accounting clarity)
+    function fmtVar(v, format, isYoYRate) {
+      if (v === null || v === undefined || Number.isNaN(v)) return '<span class="val-zero">-</span>';
+      const n = Number(v);
+      if (isYoYRate) {
+        const pct = n * 100;
+        if (Math.abs(pct) < 0.05) return '<span class="val-zero">0.0%</span>';
+        const sign = pct > 0 ? '+' : '';
+        const cls = pct > 0 ? 'val-pos' : 'val-neg';
+        return `<span class="${cls}">${sign}${pct.toFixed(1)}%</span>`;
+      }
+      if (format === 'pct') {
+        const pp = n * 100;
+        if (Math.abs(pp) < 0.05) return '<span class="val-zero">0.0%p</span>';
+        const sign = pp > 0 ? '+' : '';
+        const cls = pp > 0 ? 'val-pos' : 'val-neg';
+        return `<span class="${cls}">${sign}${pp.toFixed(1)}%p</span>`;
+      }
+      if (format === 'asp') {
+        if (Math.abs(n) < 0.5) return '<span class="val-zero">0</span>';
+        const sign = n > 0 ? '+' : '';
+        const cls = n > 0 ? 'val-pos' : 'val-neg';
+        return `<span class="${cls}">${sign}${Math.round(n).toLocaleString('en-US')}</span>`;
+      }
+      // qty or amt
+      if (Math.abs(n) < 0.05) return '<span class="val-zero">0.0</span>';
+      const sign = n > 0 ? '+' : '';
+      const cls = n > 0 ? 'val-pos' : 'val-neg';
+      return `<span class="${cls}">${sign}${n.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>`;
+    }
+
+    function getPeriodObj(periodId) {
+      return PERIOD_OPTIONS.find(p => p.id === periodId) || PERIOD_OPTIONS[7];
+    }
+
+    // =========================================================================
+    // Tab Switching & Initialization
+    // =========================================================================
+    function switchMainTab(tabIdx) {
+      state.activeTab = tabIdx;
+      [1, 2, 3].forEach(i => {
+        const btn = document.getElementById(`main-tab-${i}`);
+        const panel = document.getElementById(`tab-panel-${i}`);
+        if (i === tabIdx) {
+          btn.className = 'px-4 py-2 rounded-md text-xs font-semibold border transition flex items-center gap-1.5 tab-btn-active';
+          panel.classList.remove('hidden');
+        } else {
+          btn.className = 'px-4 py-2 rounded-md text-xs font-semibold border transition flex items-center gap-1.5 tab-btn-inactive';
+          panel.classList.add('hidden');
+        }
+      });
+      if (tabIdx === 1) renderTab1();
+      if (tabIdx === 2) renderTab2();
+      if (tabIdx === 3) renderTab3();
+    }
+
+    function drilldownToEntity(entityId) {
+      state.tab2Entity = entityId;
+      switchMainTab(2);
+    }
+
+    // =========================================================================
+    // TAB 1 RENDERING: Executive Summary & 16 Subsidiaries/Countries Scorecard
+    // =========================================================================
+    function renderTab1PeriodChips() {
+      const container = document.getElementById('tab1-period-chips');
+      container.innerHTML = PERIOD_OPTIONS.map(p => {
+        const active = p.id === state.tab1Period;
+        return `<button onclick="state.tab1Period='${p.id}'; renderTab1();" class="px-2.5 py-1 rounded text-xs font-semibold border transition ${active ? 'chip-active' : 'chip-inactive'}">${p.label}</button>`;
+      }).join('');
+    }
+
+    function renderTab1KpiCards() {
+      const pObj = getPeriodObj(state.tab1Period);
+      const euPnl = DB.data.EU.pnl;
+      const euOled = DB.data.EU.segments.OLED;
+
+      const cards = [
+        {
+          title: '판매 수량 (Volume)',
+          unit: '천대 (K)',
+          val: fmtVal(euPnl.qty[pObj.id], 'qty'),
+          subInfo: `OLED 수량: ${fmtVal(euOled.qty[pObj.id], 'qty')}K`,
+          mp: pObj.mpKey ? fmtVar(euPnl.qty[pObj.mpKey], 'qty', false) : '-',
+          prev: pObj.prevKey ? fmtVar(euPnl.qty[pObj.prevKey], 'qty', false) : '-',
+          yoy: pObj.yoyKey ? fmtVar(euPnl.qty[pObj.yoyKey], 'qty', true) : '-'
+        },
+        {
+          title: 'N.매출 (Net Sales)',
+          unit: '백만불 ($M)',
+          val: fmtVal(euPnl.nSales[pObj.id], 'amt'),
+          subInfo: `G.매출: $${fmtVal(euPnl.gSales[pObj.id], 'amt')}M`,
+          mp: pObj.mpKey ? fmtVar(euPnl.nSales[pObj.mpKey], 'amt', false) : '-',
+          prev: pObj.prevKey ? fmtVar(euPnl.nSales[pObj.prevKey], 'amt', false) : '-',
+          yoy: pObj.yoyKey ? fmtVar(euPnl.nSales[pObj.yoyKey], 'amt', true) : '-'
+        },
+        {
+          title: '차감율 (SD Rate)',
+          unit: 'G.매출 대비 %',
+          val: fmtVal(euPnl.sdRate[pObj.id], 'pct'),
+          subInfo: `판가인하: ${fmtVal(euPnl.priceCutRate[pObj.id], 'pct')}`,
+          mp: pObj.mpKey ? fmtVar(euPnl.sdRate[pObj.mpKey], 'pct', false) : '-',
+          prev: pObj.prevKey ? fmtVar(euPnl.sdRate[pObj.prevKey], 'pct', false) : '-',
+          yoy: pObj.yoyKey ? fmtVar(euPnl.sdRate[pObj.yoyKey], 'pct', false) : '-'
+        },
+        {
+          title: '평균판가 (ASP)',
+          unit: '$/대 (N.매출 기준)',
+          val: `$${fmtVal(euPnl.asp[pObj.id], 'asp')}`,
+          subInfo: `OLED 매출비중: ${fmtVal(euOled.mixRate[pObj.id], 'pct')}`,
+          mp: pObj.mpKey ? fmtVar(euPnl.asp[pObj.mpKey], 'asp', false) : '-',
+          prev: pObj.prevKey ? fmtVar(euPnl.asp[pObj.prevKey], 'asp', false) : '-',
+          yoy: pObj.yoyKey ? fmtVar(euPnl.asp[pObj.yoyKey], 'asp', false) : '-'
+        },
+        {
+          title: '영업이익 (COI)',
+          unit: '백만불 ($M)',
+          val: fmtVal(euPnl.coi[pObj.id], 'amt'),
+          subInfo: `COI%: ${fmtVal(euPnl.coiRate[pObj.id], 'pct')} | 플랫폼제외: $${fmtVal(euPnl.exPlatCoi[pObj.id], 'amt')}M`,
+          mp: pObj.mpKey ? fmtVar(euPnl.coi[pObj.mpKey], 'amt', false) : '-',
+          prev: pObj.prevKey ? fmtVar(euPnl.coi[pObj.prevKey], 'amt', false) : '-',
+          yoy: pObj.yoyKey ? fmtVar(euPnl.coi[pObj.yoyKey], 'amt', false) : '-'
+        },
+        {
+          title: '한계이익 (Marginal Profit)',
+          unit: '백만불 ($M)',
+          val: fmtVal(euPnl.mp[pObj.id], 'amt'),
+          subInfo: `한계이익률: ${fmtVal(euPnl.mpRate[pObj.id], 'pct')}`,
+          mp: pObj.mpKey ? fmtVar(euPnl.mp[pObj.mpKey], 'amt', false) : '-',
+          prev: pObj.prevKey ? fmtVar(euPnl.mp[pObj.prevKey], 'amt', false) : '-',
+          yoy: pObj.yoyKey ? fmtVar(euPnl.mp[pObj.yoyKey], 'amt', false) : '-'
+        }
+      ];
+
+      document.getElementById('tab1-kpi-grid').innerHTML = cards.map(c => `
+        <div class="bg-white border border-slate-200 rounded-lg p-3.5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+              <span>${c.title}</span>
+              <span class="text-[11px] text-slate-400">${c.unit}</span>
+            </div>
+            <div class="text-2xl font-bold text-slate-900 num-mono mt-1">${c.val}</div>
+            <div class="text-[11px] text-slate-600 mt-0.5 num-mono">${c.subInfo}</div>
+          </div>
+          <div class="mt-2.5 pt-2 border-t border-slate-100 grid grid-cols-3 gap-1 text-[11px] num-mono">
+            <div class="bg-slate-50 rounded px-1.5 py-1">
+              <div class="text-[10px] text-slate-400">이동비</div>
+              <div class="font-semibold">${c.mp}</div>
+            </div>
+            <div class="bg-slate-50 rounded px-1.5 py-1">
+              <div class="text-[10px] text-slate-400">9월선행비</div>
+              <div class="font-semibold">${c.prev}</div>
+            </div>
+            <div class="bg-slate-50 rounded px-1.5 py-1">
+              <div class="text-[10px] text-slate-400">전년비</div>
+              <div class="font-semibold">${c.yoy}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setTab1ChartMode(mode) {
+      state.tab1ChartMode = mode;
+      document.getElementById('t1-chart-mode-m').className = `px-2.5 py-1 rounded text-[11px] font-semibold border ${mode === 'monthly' ? 'chip-active' : 'chip-inactive'}`;
+      document.getElementById('t1-chart-mode-q').className = `px-2.5 py-1 rounded text-[11px] font-semibold border ${mode === 'quarterly' ? 'chip-active' : 'chip-inactive'}`;
+      renderTab1Charts();
+    }
+
+    function renderTab1Charts() {
+      const pObj = getPeriodObj(state.tab1Period);
+      document.getElementById('t1-chart2-period-label').textContent = pObj.label;
+
+      // Chart 1: EU Trend
+      const euPnl = DB.data.EU.pnl;
+      const series = state.tab1ChartMode === 'monthly'
+        ? [
+            { k: 'y26_m1', l: "'26.1월", f: false }, { k: 'y26_m2', l: "2월", f: false }, { k: 'y26_m3', l: "3월", f: false },
+            { k: 'y26_m4', l: "4월", f: false }, { k: 'y26_m5', l: "5월", f: false }, { k: 'y26_m6', l: "6월", f: false },
+            { k: 'y26_m7', l: "7월", f: false }, { k: 'y26_m8', l: "8월", f: false }, { k: 'y26_m9', l: "9월(실적◁)", f: false },
+            { k: 'y26_m10', l: "10월(▶선행)", f: true }, { k: 'y26_m11', l: "11월", f: true }, { k: 'y26_m12', l: "12월", f: true },
+            { k: 'y27_m1', l: "'27.1월", f: true }, { k: 'y27_m2', l: "2월", f: true }, { k: 'y27_m3', l: "3월", f: true }
+          ]
+        : [
+            { k: 'y25_q1', l: "'25.1Q", f: false }, { k: 'y25_q2', l: "'25.2Q", f: false },
+            { k: 'y25_q3', l: "'25.3Q", f: false }, { k: 'y25_q4', l: "'25.4Q", f: false },
+            { k: 'y26_q1', l: "'26.1Q", f: false }, { k: 'y26_q2', l: "'26.2Q", f: false },
+            { k: 'y26_q3', l: "'26.3Q(실적◁)", f: false }, { k: 'y26_q4', l: "'26.4Q(▶선행)", f: true },
+            { k: 'y27_q1', l: "'27.1Q(▶선행)", f: true }
+          ];
+
+      const labels = series.map(s => s.l);
+      const nSalesArr = series.map(s => Number((euPnl.nSales[s.k] || 0).toFixed(1)));
+      const coiRateArr = series.map(s => Number(((euPnl.coiRate[s.k] || 0) * 100).toFixed(1)));
+      const mpRateArr = series.map(s => Number(((euPnl.mpRate[s.k] || 0) * 100).toFixed(1)));
+      const barColors = series.map(s => s.f ? 'rgba(13, 148, 136, 0.80)' : 'rgba(15, 23, 42, 0.80)');
+
+      if (chartEuTrendInstance) chartEuTrendInstance.destroy();
+      const ctx1 = document.getElementById('chart-eu-trend').getContext('2d');
+      chartEuTrendInstance = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              type: 'bar',
+              label: 'N.매출 ($M)',
+              data: nSalesArr,
+              backgroundColor: barColors,
+              yAxisID: 'y',
+              borderRadius: 3
+            },
+            {
+              type: 'line',
+              label: '영업이익률 COI (%)',
+              data: coiRateArr,
+              borderColor: '#EF4444',
+              backgroundColor: '#EF4444',
+              borderWidth: 2,
+              tension: 0.25,
+              yAxisID: 'y1'
+            },
+            {
+              type: 'line',
+              label: '한계이익률 MP (%)',
+              data: mpRateArr,
+              borderColor: '#3B82F6',
+              backgroundColor: '#3B82F6',
+              borderWidth: 2,
+              borderDash: [4, 3],
+              tension: 0.25,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+          },
+          scales: {
+            y: { position: 'left', title: { display: true, text: 'N.매출 ($M)', font: { size: 11 } } },
+            y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: '이익률 (%)', font: { size: 11 } } }
+          }
+        }
+      });
+
+      // Chart 2: 16 Subsidiaries/Countries Comparison
+      const subEntities = ENTITIES.filter(e => e.id !== 'EU');
+      const metricMode = document.getElementById('t1-chart2-metric').value;
+      const subLabels = subEntities.map(e => `${e.nameKo}(${e.id})`);
+
+      let ds1 = {}, ds2 = {};
+      if (metricMode === 'nSales_coiRate') {
+        ds1 = {
+          type: 'bar', label: 'N.매출 ($M)', yAxisID: 'y',
+          data: subEntities.map(e => Number((DB.data[e.id].pnl.nSales[pObj.id] || 0).toFixed(1))),
+          backgroundColor: subEntities.map(e => e.isCountrySheet ? '#0D9488' : '#1E293B'),
+          borderRadius: 3
+        };
+        ds2 = {
+          type: 'line', label: '영업이익률 COI (%)', yAxisID: 'y1',
+          data: subEntities.map(e => Number(((DB.data[e.id].pnl.coiRate[pObj.id] || 0) * 100).toFixed(1))),
+          borderColor: '#EF4444', backgroundColor: '#EF4444', borderWidth: 2
+        };
+      } else if (metricMode === 'coi_varPrev') {
+        ds1 = {
+          type: 'bar', label: '영업이익 COI ($M)', yAxisID: 'y',
+          data: subEntities.map(e => Number((DB.data[e.id].pnl.coi[pObj.id] || 0).toFixed(2))),
+          backgroundColor: subEntities.map(e => (DB.data[e.id].pnl.coi[pObj.id] || 0) >= 0 ? '#0D9488' : '#EF4444'),
+          borderRadius: 3
+        };
+        ds2 = {
+          type: 'bar', label: '9월차 선행비 COI ($M)', yAxisID: 'y',
+          data: subEntities.map(e => Number((pObj.prevKey ? (DB.data[e.id].pnl.coi[pObj.prevKey] || 0) : 0).toFixed(2))),
+          backgroundColor: '#3B82F6', borderRadius: 3
+        };
+      } else if (metricMode === 'mp_mpRate') {
+        ds1 = {
+          type: 'bar', label: '한계이익 MP ($M)', yAxisID: 'y',
+          data: subEntities.map(e => Number((DB.data[e.id].pnl.mp[pObj.id] || 0).toFixed(1))),
+          backgroundColor: '#0F172A', borderRadius: 3
+        };
+        ds2 = {
+          type: 'line', label: '한계이익률 MP (%)', yAxisID: 'y1',
+          data: subEntities.map(e => Number(((DB.data[e.id].pnl.mpRate[pObj.id] || 0) * 100).toFixed(1))),
+          borderColor: '#0D9488', backgroundColor: '#0D9488', borderWidth: 2
+        };
+      } else {
+        ds1 = {
+          type: 'bar', label: '판매 수량 (K)', yAxisID: 'y',
+          data: subEntities.map(e => Number((DB.data[e.id].pnl.qty[pObj.id] || 0).toFixed(1))),
+          backgroundColor: '#1E293B', borderRadius: 3
+        };
+        ds2 = {
+          type: 'line', label: 'ASP ($/대)', yAxisID: 'y1',
+          data: subEntities.map(e => Math.round(DB.data[e.id].pnl.asp[pObj.id] || 0)),
+          borderColor: '#F59E0B', backgroundColor: '#F59E0B', borderWidth: 2
+        };
+      }
+
+      if (chartSubRankingInstance) chartSubRankingInstance.destroy();
+      const ctx2 = document.getElementById('chart-sub-ranking').getContext('2d');
+      chartSubRankingInstance = new Chart(ctx2, {
+        type: 'bar',
+        data: { labels: subLabels, datasets: [ds1, ds2] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+          },
+          scales: {
+            x: { ticks: { font: { size: 10 } } },
+            y: { position: 'left' },
+            y1: { position: 'right', grid: { drawOnChartArea: false }, display: ds2.yAxisID === 'y1' }
+          }
+        }
+      });
+    }
+
+    function renderTab1ScorecardTable() {
+      const pObj = getPeriodObj(state.tab1Period);
+      document.getElementById('t1-table-period-label').textContent = pObj.label;
+
+      const showMp = document.getElementById('t1-show-mp').checked && !!pObj.mpKey;
+      const showPrev = document.getElementById('t1-show-prev').checked && !!pObj.prevKey;
+      const showYoy = document.getElementById('t1-show-yoy').checked && !!pObj.yoyKey;
+
+      const extraCols = (showMp ? 1 : 0) + (showPrev ? 1 : 0) + (showYoy ? 1 : 0);
+      const groupSpan = 1 + extraCols;
+
+      const subHeaders = () => {
+        let h = `<th>실적/선행</th>`;
+        if (showMp) h += `<th class="text-teal-300">이동비</th>`;
+        if (showPrev) h += `<th class="text-sky-300">9월선행비</th>`;
+        if (showYoy) h += `<th class="text-amber-300">전년비</th>`;
+        return h;
+      };
+
+      const thead = `
+        <thead>
+          <tr>
+            <th rowspan="2" class="sticky-col-1" style="min-width:110px;">조직 (코드)</th>
+            <th rowspan="2" class="sticky-col-2" style="min-width:85px;">원천 시트</th>
+            <th colspan="${groupSpan}">수량 (천대)</th>
+            <th colspan="2">G.매출 & 차감율</th>
+            <th colspan="${groupSpan}">N.매출 (백만불)</th>
+            <th rowspan="2">ASP<br/>($/대)</th>
+            <th colspan="${groupSpan}">영업이익 COI (백만불)</th>
+            <th rowspan="2">COI%</th>
+            <th colspan="${groupSpan}">한계이익 MP (백만불)</th>
+            <th rowspan="2">MP%</th>
+            <th rowspan="2">플랫폼제외<br/>COI ($M)</th>
+            <th rowspan="2">OLED<br/>매출비중</th>
+          </tr>
+          <tr>
+            ${subHeaders()}
+            <th>G.매출($M)</th>
+            <th>차감(%)</th>
+            ${subHeaders()}
+            ${subHeaders()}
+            ${subHeaders()}
+          </tr>
+        </thead>
+      `;
+
+      const renderMetricCells = (metricObj, format, isRateYoY) => {
+        let cells = `<td class="text-right num-mono font-semibold ${pObj.isForecast ? 'col-forecast' : ''}">${fmtVal(metricObj[pObj.id], format)}</td>`;
+        if (showMp) cells += `<td class="text-right num-mono col-var">${fmtVar(metricObj[pObj.mpKey], format, false)}</td>`;
+        if (showPrev) cells += `<td class="text-right num-mono col-var">${fmtVar(metricObj[pObj.prevKey], format, false)}</td>`;
+        if (showYoy) cells += `<td class="text-right num-mono col-var">${fmtVar(metricObj[pObj.yoyKey], format, isRateYoY)}</td>`;
+        return cells;
+      };
+
+      const rowsHtml = ENTITIES.map(ent => {
+        const d = DB.data[ent.id];
+        const pnl = d.pnl;
+        const oled = d.segments.OLED;
+        const isEu = ent.id === 'EU';
+        const sheetBadgeClass = ent.sheet === '지역별'
+          ? 'bg-slate-900 text-white'
+          : (ent.sheet === '국가별' ? 'bg-teal-700 text-white' : 'bg-slate-100 text-slate-700 border border-slate-300');
+
+        return `
+          <tr onclick="drilldownToEntity('${ent.id}')" class="cursor-pointer ${isEu ? 'row-eu-total' : ''}">
+            <td class="sticky-col-1 font-semibold text-slate-900 hover:text-teal-700">
+              <div class="flex items-center justify-between">
+                <span>${ent.nameKo}</span>
+                <span class="text-[10px] text-slate-500 num-mono ml-1">${ent.id}</span>
+              </div>
+            </td>
+            <td class="sticky-col-2 text-center">
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${sheetBadgeClass}">${ent.sheet}</span>
+            </td>
+            ${renderMetricCells(pnl.qty, 'qty', true)}
+            <td class="text-right num-mono">${fmtVal(pnl.gSales[pObj.id], 'amt')}</td>
+            <td class="text-right num-mono">${fmtVal(pnl.sdRate[pObj.id], 'pct')}</td>
+            ${renderMetricCells(pnl.nSales, 'amt', true)}
+            <td class="text-right num-mono">${fmtVal(pnl.asp[pObj.id], 'asp')}</td>
+            ${renderMetricCells(pnl.coi, 'amt', false)}
+            <td class="text-right num-mono font-semibold">${fmtVal(pnl.coiRate[pObj.id], 'pct')}</td>
+            ${renderMetricCells(pnl.mp, 'amt', false)}
+            <td class="text-right num-mono font-semibold">${fmtVal(pnl.mpRate[pObj.id], 'pct')}</td>
+            <td class="text-right num-mono">${fmtVal(pnl.exPlatCoi[pObj.id], 'amt')}</td>
+            <td class="text-right num-mono">${fmtVal(oled.mixRate[pObj.id], 'pct')}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('tab1-scorecard-table').innerHTML = thead + `<tbody>${rowsHtml}</tbody>`;
+    }
+
+    function renderTab1() {
+      renderTab1PeriodChips();
+      renderTab1KpiCards();
+      renderTab1Charts();
+      renderTab1ScorecardTable();
+    }
+
+    // =========================================================================
+    // TAB 2 RENDERING: Detailed PnL & 10 Product Segments Matrix
+    // =========================================================================
+    function setTab2ColMode(mode) {
+      state.tab2ColMode = mode;
+      document.getElementById('t2-colmode-summary').className = `px-3 py-1.5 text-xs font-semibold border rounded-l-md ${mode === 'summary' ? 'chip-active' : 'chip-inactive'}`;
+      document.getElementById('t2-colmode-monthly').className = `px-3 py-1.5 text-xs font-semibold border rounded-r-md ${mode === 'monthly' ? 'chip-active' : 'chip-inactive'}`;
+      document.getElementById('t2-summary-var-controls').classList.toggle('hidden', mode !== 'summary');
+      document.getElementById('t2-monthly-val-controls').classList.toggle('hidden', mode !== 'monthly');
+      renderTab2();
+    }
+
+    function setTab2RowMode(mode) {
+      state.tab2RowMode = mode;
+      document.getElementById('t2-rowmode-core').className = `px-3 py-1.5 text-xs font-semibold border rounded-l-md ${mode === 'core' ? 'chip-active' : 'chip-inactive'}`;
+      document.getElementById('t2-rowmode-all').className = `px-3 py-1.5 text-xs font-semibold border rounded-r-md ${mode === 'all' ? 'chip-active' : 'chip-inactive'}`;
+      renderTab2();
+    }
+
+    function renderTab2Controls() {
+      // Entity chips
+      document.getElementById('tab2-entity-chips').innerHTML = ENTITIES.map(ent => {
+        const active = ent.id === state.tab2Entity;
+        const badge = ent.sheet === '국가별' ? '★국가별' : (ent.sheet === '지역별' ? '지역별' : '');
+        return `
+          <button onclick="state.tab2Entity='${ent.id}'; renderTab2();" class="px-2.5 py-1 rounded text-xs font-semibold border transition flex items-center gap-1 ${active ? 'chip-active' : 'chip-inactive'}">
+            <span>${ent.nameKo} (${ent.id})</span>
+            ${badge ? `<span class="text-[10px] opacity-80">[${badge}]</span>` : ''}
+          </button>
+        `;
+      }).join('');
+
+      // Segment filter chips
+      const segChoices = [
+        { id: 'ALL', label: '전체 보기 (손익 + 10대 제품군)' },
+        { id: 'PNL_ONLY', label: '전체 손익(PnL)만' },
+        ...SEGMENTS.map(s => ({ id: s.id, label: s.label }))
+      ];
+      document.getElementById('tab2-segment-chips').innerHTML = segChoices.map(sc => {
+        const active = sc.id === state.tab2SegmentFilter;
+        return `<button onclick="state.tab2SegmentFilter='${sc.id}'; renderTab2();" class="px-2.5 py-1 rounded text-xs font-medium border transition ${active ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-slate-300 hover:border-slate-500'}">${sc.label}</button>`;
+      }).join('');
+    }
+
+    function buildSummaryColumns(isCountrySheet) {
+      const showMp = document.getElementById('t2-var-mp').checked;
+      const showPrev = document.getElementById('t2-var-prev').checked;
+      const showYoy = document.getElementById('t2-var-yoy').checked;
+      const showSg = document.getElementById('t2-var-sg').checked && !isCountrySheet;
+
+      // Matches Excel '요약' sheet groups
+      const groups = [
+        {
+          title: "'25년 연간",
+          cols: [
+            { key: 'y25_yr', label: '실적', type: 'val', isForecast: false },
+            ...(showYoy ? [{ key: 'y25_yr_yoy', label: '전년비', type: 'yoy' }] : [])
+          ]
+        },
+        {
+          title: "'26년 상반기",
+          cols: [
+            { key: 'y26_h1', label: '실적◁', type: 'val', isForecast: false },
+            ...(showYoy ? [{ key: 'y26_h1_yoy', label: '전년비', type: 'yoy' }] : []),
+            ...(showSg ? [{ key: 'varSg_h1', label: 'SG비', type: 'var' }] : [])
+          ]
+        },
+        {
+          title: "'26년 3분기",
+          cols: [
+            { key: 'y26_q3', label: '실적◁', type: 'val', isForecast: false },
+            ...(showMp ? [{ key: 'varMp_q3', label: '이동비', type: 'var' }] : []),
+            ...(showPrev ? [{ key: 'varPrev_q3', label: '9월선행비', type: 'var' }] : []),
+            ...(showYoy ? [{ key: 'y26_q3_yoy', label: '전년비', type: 'yoy' }] : []),
+            ...(showSg ? [{ key: 'varSg_q3', label: 'SG비', type: 'var' }] : [])
+          ]
+        },
+        {
+          title: "'26년 10월 (▶선행)",
+          cols: [
+            { key: 'y26_m10', label: '▶선행', type: 'val', isForecast: true },
+            ...(showMp ? [{ key: 'varMp_m10', label: '이동비', type: 'var' }] : []),
+            ...(showPrev ? [{ key: 'varPrev_m10', label: '9월선행비', type: 'var' }] : []),
+            ...(showYoy ? [{ key: 'y26_m10_yoy', label: '전년비', type: 'yoy' }] : []),
+            ...(showSg ? [{ key: 'varSg_m10', label: 'SG비', type: 'var' }] : [])
+          ]
+        },
+        {
+          title: "'26년 11월~12월 (▶선행)",
+          cols: [
+            { key: 'y26_m11', label: '11월선행', type: 'val', isForecast: true },
+            ...(showPrev ? [{ key: 'varPrev_m11', label: '11월선행비', type: 'var' }] : []),
+            { key: 'y26_m12', label: '12월선행', type: 'val', isForecast: true },
+            ...(showPrev ? [{ key: 'varPrev_m12', label: '12월선행비', type: 'var' }] : [])
+          ]
+        },
+        {
+          title: "'26년 4분기 (▶선행)",
+          cols: [
+            { key: 'y26_q4', label: '▶선행', type: 'val', isForecast: true },
+            ...(showMp ? [{ key: 'varMp_q4', label: '이동비', type: 'var' }] : []),
+            ...(showPrev ? [{ key: 'varPrev_q4', label: '9월선행비', type: 'var' }] : []),
+            ...(showYoy ? [{ key: 'y26_q4_yoy', label: '전년비', type: 'yoy' }] : []),
+            ...(showSg ? [{ key: 'varSg_q4', label: 'SG비', type: 'var' }] : [])
+          ]
+        },
+        {
+          title: "'26년 연간 (▶선행)",
+          cols: [
+            { key: 'y26_yr', label: '연간선행', type: 'val', isForecast: true },
+            ...(showMp ? [{ key: 'varMp_yr', label: '이동비', type: 'var' }] : []),
+            ...(showPrev ? [{ key: 'varPrev_yr', label: '9월선행비', type: 'var' }] : []),
+            ...(showYoy ? [{ key: 'y26_yr_yoy', label: '전년비', type: 'yoy' }] : []),
+            ...(showSg ? [{ key: 'varSg_yr', label: 'SG비', type: 'var' }] : [])
+          ]
+        },
+        {
+          title: "'27년 1분기 (▶선행)",
+          cols: [
+            { key: 'y27_q1', label: '▶선행', type: 'val', isForecast: true },
+            ...(showPrev ? [{ key: 'varPrev_y27_q1', label: '9월선행비', type: 'var' }] : []),
+            ...(showYoy ? [{ key: 'y27_q1_yoy', label: '전년비', type: 'yoy' }] : [])
+          ]
+        }
+      ];
+      return groups;
+    }
+
+    function buildMonthlyColumns() {
+      const valType = document.getElementById('t2-monthly-valtype').value; // 'val' | 'varPrev' | 'varMp' | 'yoy' | 'varSg'
+      const show25 = document.getElementById('t2-monthly-show25').checked;
+
+      if (valType === 'val') {
+        const groups = [];
+        if (show25) {
+          groups.push({
+            title: "'25년 실적",
+            cols: [
+              { key: 'y25_q1', label: '1Q', type: 'val', isForecast: false },
+              { key: 'y25_q2', label: '2Q', type: 'val', isForecast: false },
+              { key: 'y25_h1', label: '상반기', type: 'val', isForecast: false },
+              { key: 'y25_q3', label: '3Q', type: 'val', isForecast: false },
+              { key: 'y25_q4', label: '4Q', type: 'val', isForecast: false },
+              { key: 'y25_h2', label: '하반기', type: 'val', isForecast: false },
+              { key: 'y25_yr', label: '연간', type: 'val', isForecast: false }
+            ]
+          });
+        }
+        groups.push({
+          title: "'26년 상반기 (1~6월 실적◁)",
+          cols: [
+            { key: 'y26_m1', label: '1월', type: 'val', isForecast: false },
+            { key: 'y26_m2', label: '2월', type: 'val', isForecast: false },
+            { key: 'y26_m3', label: '3월', type: 'val', isForecast: false },
+            { key: 'y26_q1', label: '1분기', type: 'val', isForecast: false },
+            { key: 'y26_m4', label: '4월', type: 'val', isForecast: false },
+            { key: 'y26_m5', label: '5월', type: 'val', isForecast: false },
+            { key: 'y26_m6', label: '6월', type: 'val', isForecast: false },
+            { key: 'y26_q2', label: '2분기', type: 'val', isForecast: false },
+            { key: 'y26_h1', label: '상반기', type: 'val', isForecast: false }
+          ]
+        });
+        groups.push({
+          title: "'26년 하반기 (7~9월 실적◁ / 10~12월 ▶선행)",
+          cols: [
+            { key: 'y26_m7', label: '7월', type: 'val', isForecast: false },
+            { key: 'y26_m8', label: '8월', type: 'val', isForecast: false },
+            { key: 'y26_m9', label: '9월◁', type: 'val', isForecast: false },
+            { key: 'y26_q3', label: '3분기', type: 'val', isForecast: false },
+            { key: 'y26_m10', label: '▶10월', type: 'val', isForecast: true },
+            { key: 'y26_m11', label: '▶11월', type: 'val', isForecast: true },
+            { key: 'y26_m12', label: '▶12월', type: 'val', isForecast: true },
+            { key: 'y26_q4', label: '▶4분기', type: 'val', isForecast: true },
+            { key: 'y26_h2', label: '▶하반기', type: 'val', isForecast: true },
+            { key: 'y26_yr', label: '▶26연간', type: 'val', isForecast: true }
+          ]
+        });
+        groups.push({
+          title: "'27년 1분기 (▶선행)",
+          cols: [
+            { key: 'y27_m1', label: '▶1월', type: 'val', isForecast: true },
+            { key: 'y27_m2', label: '▶2월', type: 'val', isForecast: true },
+            { key: 'y27_m3', label: '▶3월', type: 'val', isForecast: true },
+            { key: 'y27_q1', label: '▶1분기', type: 'val', isForecast: true }
+          ]
+        });
+        return groups;
+      }
+
+      if (valType === 'varPrev') {
+        return [
+          {
+            title: "9월차 선행비 ('26.7월 ~ 연간)",
+            cols: [
+              { key: 'varPrev_m7', label: '7월', type: 'var' },
+              { key: 'varPrev_m8', label: '8월', type: 'var' },
+              { key: 'varPrev_m9', label: '9월', type: 'var' },
+              { key: 'varPrev_q3', label: '3분기', type: 'var' },
+              { key: 'varPrev_m10', label: '10월', type: 'var' },
+              { key: 'varPrev_m11', label: '11월', type: 'var' },
+              { key: 'varPrev_m12', label: '12월', type: 'var' },
+              { key: 'varPrev_q4', label: '4분기', type: 'var' },
+              { key: 'varPrev_h2', label: '하반기', type: 'var' },
+              { key: 'varPrev_yr', label: '26연간', type: 'var' }
+            ]
+          },
+          {
+            title: "9월차 선행비 ('27.1월 ~ 1분기)",
+            cols: [
+              { key: 'varPrev_y27_m1', label: '27.1월', type: 'var' },
+              { key: 'varPrev_y27_m2', label: '27.2월', type: 'var' },
+              { key: 'varPrev_y27_m3', label: '27.3월', type: 'var' },
+              { key: 'varPrev_y27_q1', label: '27.1분기', type: 'var' }
+            ]
+          }
+        ];
+      }
+
+      if (valType === 'varMp') {
+        return [
+          {
+            title: "10월차 이동비 ('26.7월 ~ 연간)",
+            cols: [
+              { key: 'varMp_m7', label: '7월', type: 'var' },
+              { key: 'varMp_m8', label: '8월', type: 'var' },
+              { key: 'varMp_m9', label: '9월', type: 'var' },
+              { key: 'varMp_q3', label: '3분기', type: 'var' },
+              { key: 'varMp_m10', label: '10월', type: 'var' },
+              { key: 'varMp_m11', label: '11월', type: 'var' },
+              { key: 'varMp_m12', label: '12월', type: 'var' },
+              { key: 'varMp_q4', label: '4분기', type: 'var' },
+              { key: 'varMp_h2', label: '하반기', type: 'var' },
+              { key: 'varMp_yr', label: '26연간', type: 'var' }
+            ]
+          }
+        ];
+      }
+
+      if (valType === 'yoy') {
+        return [
+          {
+            title: "'26년 월별/분기별 전년비 (YoY)",
+            cols: [
+              { key: 'y26_m1_yoy', label: '1월', type: 'yoy' },
+              { key: 'y26_m2_yoy', label: '2월', type: 'yoy' },
+              { key: 'y26_m3_yoy', label: '3월', type: 'yoy' },
+              { key: 'y26_q1_yoy', label: '1분기', type: 'yoy' },
+              { key: 'y26_m4_yoy', label: '4월', type: 'yoy' },
+              { key: 'y26_m5_yoy', label: '5월', type: 'yoy' },
+              { key: 'y26_m6_yoy', label: '6월', type: 'yoy' },
+              { key: 'y26_q2_yoy', label: '2분기', type: 'yoy' },
+              { key: 'y26_h1_yoy', label: '상반기', type: 'yoy' },
+              { key: 'y26_m7_yoy', label: '7월', type: 'yoy' },
+              { key: 'y26_m8_yoy', label: '8월', type: 'yoy' },
+              { key: 'y26_m9_yoy', label: '9월', type: 'yoy' },
+              { key: 'y26_q3_yoy', label: '3분기', type: 'yoy' },
+              { key: 'y26_m10_yoy', label: '10월', type: 'yoy' },
+              { key: 'y26_m11_yoy', label: '11월', type: 'yoy' },
+              { key: 'y26_m12_yoy', label: '12월', type: 'yoy' },
+              { key: 'y26_q4_yoy', label: '4분기', type: 'yoy' },
+              { key: 'y26_h2_yoy', label: '하반기', type: 'yoy' },
+              { key: 'y26_yr_yoy', label: '26연간', type: 'yoy' }
+            ]
+          },
+          {
+            title: "'27년 1분기 전년비 (YoY)",
+            cols: [
+              { key: 'y27_m1_yoy', label: '27.1월', type: 'yoy' },
+              { key: 'y27_m2_yoy', label: '27.2월', type: 'yoy' },
+              { key: 'y27_m3_yoy', label: '27.3월', type: 'yoy' },
+              { key: 'y27_q1_yoy', label: '27.1분기', type: 'yoy' }
+            ]
+          }
+        ];
+      }
+
+      // varSg
+      return [
+        {
+          title: "'26년 SG비 (SG 목표 대비 차이)",
+          cols: [
+            { key: 'varSg_q1', label: '1분기', type: 'var' },
+            { key: 'varSg_q2', label: '2분기', type: 'var' },
+            { key: 'varSg_h1', label: '상반기', type: 'var' },
+            { key: 'varSg_q3', label: '3분기', type: 'var' },
+            { key: 'varSg_m10', label: '10월', type: 'var' },
+            { key: 'varSg_m11', label: '11월', type: 'var' },
+            { key: 'varSg_m12', label: '12월', type: 'var' },
+            { key: 'varSg_q4', label: '4분기', type: 'var' },
+            { key: 'varSg_h2', label: '하반기', type: 'var' },
+            { key: 'varSg_yr', label: '26연간', type: 'var' }
+          ]
+        }
+      ];
+    }
+
+    function renderTab2() {
+      renderTab2Controls();
+      const entData = DB.data[state.tab2Entity];
+      const ent = entData.meta;
+
+      document.getElementById('tab2-table-title').innerHTML = `
+        <span class="w-1 h-4 bg-slate-900 rounded-sm inline-block mr-2"></span>
+        ${ent.nameKo} (${ent.nameEn}) — 전체 손익(PnL) 및 10대 제품군(BLU) 상세 매트릭스
+      `;
+      document.getElementById('tab2-source-badge').textContent = `원천: '${ent.sheet}' 시트 (Row ${ent.startRow}~)`;
+
+      const colGroups = state.tab2ColMode === 'summary'
+        ? buildSummaryColumns(ent.isCountrySheet)
+        : buildMonthlyColumns();
+
+      const allCols = [];
+      colGroups.forEach(g => g.cols.forEach(c => allCols.push(c)));
+
+      const theadRow1 = colGroups.map(g => `<th colspan="${g.cols.length}">${g.title}</th>`).join('');
+      const theadRow2 = allCols.map(c => {
+        const cls = c.type === 'yoy' ? 'text-amber-300' : (c.type === 'var' ? 'text-teal-300' : '');
+        return `<th class="${cls}">${c.label}</th>`;
+      }).join('');
+
+      const thead = `
+        <thead>
+          <tr>
+            <th rowspan="2" class="sticky-col-1" style="min-width:110px;">구분 (섹션)</th>
+            <th rowspan="2" class="sticky-col-2" style="min-width:155px;">손익 / 제품군 항목</th>
+            ${theadRow1}
+          </tr>
+          <tr>
+            ${theadRow2}
+          </tr>
+        </thead>
+      `;
+
+      const showAllRows = state.tab2RowMode === 'all';
+      const segFilter = state.tab2SegmentFilter;
+      let tbodyHtml = '';
+
+      const renderCellsForRow = (rowValues, format, yoyMode) => {
+        return allCols.map(c => {
+          const v = rowValues ? rowValues[c.key] : null;
+          if (c.type === 'val') {
+            return `<td class="text-right num-mono ${c.isForecast ? 'col-forecast font-semibold' : ''}">${fmtVal(v, format)}</td>`;
+          }
+          if (c.type === 'yoy') {
+            return `<td class="text-right num-mono col-var">${fmtVar(v, format, yoyMode === 'rate')}</td>`;
+          }
+          return `<td class="text-right num-mono col-var">${fmtVar(v, format, false)}</td>`;
+        }).join('');
+      };
+
+      // Part 1: Total PnL Section
+      if (segFilter === 'ALL' || segFilter === 'PNL_ONLY') {
+        const metricsToShow = PNL_METRICS.filter(m => {
+          if (ent.isCountrySheet && m.offsetCountry === null) return false;
+          return showAllRows ? true : m.isCore;
         });
 
-        async function loadData() {
-            try {
-                // Fetch JSON with cache-busting timestamp to bypass stale browser cache
-                const response = await fetch('advance_profitability_data.json?t=' + Date.now());
-                if (response.ok) {
-                    dashboardData = await response.json();
-                    console.log('Loaded fresh JSON Data:', dashboardData);
-                    return;
-                }
-            } catch (err) {
-                console.warn('Fetch JSON failed, falling back to window variable:', err);
-            }
-            if (window.ADVANCE_PROFITABILITY_DATA) {
-                dashboardData = window.ADVANCE_PROFITABILITY_DATA;
-                console.log('Loaded preloaded JS variable:', dashboardData);
-            }
-        }
+        metricsToShow.forEach((m, idx) => {
+          const isHighlight = ['qty', 'nSales', 'coi', 'coiRate', 'mp', 'mpRate', 'exPlatCoi'].includes(m.key);
+          tbodyHtml += `
+            <tr class="${isHighlight ? 'row-highlight' : ''}">
+              <td class="sticky-col-1 font-bold text-slate-800">${idx === 0 ? '전체 손익 (PnL)' : '<span class="text-slate-400 font-normal">전체 손익</span>'}</td>
+              <td class="sticky-col-2 ${isHighlight ? 'font-bold text-slate-900' : 'text-slate-700'}">
+                <div class="flex items-center justify-between">
+                  <span>${m.label}</span>
+                  <span class="text-[10px] text-slate-400 num-mono ml-1">${m.subLabel}</span>
+                </div>
+              </td>
+              ${renderCellsForRow(entData.pnl[m.key], m.format, m.yoyMode)}
+            </tr>
+          `;
+        });
+      }
 
-        // Tab Navigation Switcher
-        function switchTab(tabId) {
-            activeTab = tabId;
-            document.querySelectorAll('.tab-content').forEach(el => {
-                el.classList.add('hidden');
-                el.style.display = 'none';
-            });
-            
-            const targetEl = document.getElementById(tabId);
-            if (targetEl) {
-                targetEl.classList.remove('hidden');
-                targetEl.style.display = 'block';
-            }
+      // Part 2: 10 Product Segments
+      if (segFilter !== 'PNL_ONLY') {
+        const segsToShow = SEGMENTS.filter(s => segFilter === 'ALL' || s.id === segFilter);
+        const segMetricsToShow = SEGMENT_METRICS.filter(sm => showAllRows ? true : sm.isCore);
 
-            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-            const navBtn = document.getElementById('nav-' + tabId);
-            if (navBtn) navBtn.classList.add('active');
-
-            const titles = {
-                'tab-overview': 'Executive Overview (유럽 전체 선행수익성)',
-                'tab-subsidiary': '법인별 수익성 분석 (Subsidiary Performance)',
-                'tab-strategic': '전략제품 판매 연간 예상 (OLED / MRGB / QNED)'
-            };
-            const pageTitleEl = document.getElementById('page-title');
-            if (pageTitleEl) pageTitleEl.innerText = titles[tabId] || '대시보드';
-
-            // Filter visibility control based on active tab
-            const metricFilterContainer = document.getElementById('container-metric-filter');
-            const subFilterContainer = document.getElementById('container-sub-filter');
-            
-            if (tabId === 'tab-subsidiary') {
-                if (metricFilterContainer) metricFilterContainer.classList.add('hidden');
-                if (subFilterContainer) subFilterContainer.classList.remove('hidden');
-            } else if (tabId === 'tab-overview') {
-                if (metricFilterContainer) metricFilterContainer.classList.remove('hidden');
-                if (subFilterContainer) subFilterContainer.classList.add('hidden');
-            } else {
-                if (metricFilterContainer) metricFilterContainer.classList.add('hidden');
-                if (subFilterContainer) subFilterContainer.classList.add('hidden');
-            }
-
-            renderActiveTab();
-        }
-
-        function applyGlobalFilters() {
-            renderActiveTab();
-        }
-
-        function resetFilters() {
-            const subFilter = document.getElementById('filter-sub');
-            if (subFilter) subFilter.value = 'LGEDG';
-            applyGlobalFilters();
-        }
-
-        function renderDashboard() {
-            if (!dashboardData) return;
-            renderActiveTab();
-        }
-
-        function renderActiveTab() {
-            if (!dashboardData) return;
-            if (activeTab === 'tab-overview') renderOverviewTab();
-            if (activeTab === 'tab-subsidiary') renderSubsidiaryTab();
-            if (activeTab === 'tab-strategic') renderStrategicTab();
-        }
-
-        // ==================== TAB 3: STRATEGIC PRODUCTS RENDERER ====================
-        function renderStrategicTab() {
-            const strategicData = dashboardData?.strategic_reports || { oled: [], mrgb: [], qned: [] };
-            
-            renderStrategicTable('table-strategic-oled', strategicData.oled, 'OLED');
-            renderStrategicTable('table-strategic-mrgb', strategicData.mrgb, 'MRGB');
-            renderStrategicTable('table-strategic-qned', strategicData.qned, 'QNED');
-        }
-
-        function renderStrategicTable(tableId, rowsData, prodType) {
-            const tableEl = document.getElementById(tableId);
-            if (!tableEl) return;
-            
-            const isMRGB = (prodType === 'MRGB');
-            const ratioColName = isMRGB ? 'SG비' : (prodType === 'QNED' ? 'SG비' : 'BP비');
-            const ratioQColName = isMRGB ? 'SG비(Q)' : (prodType === 'QNED' ? 'SG비(Q)' : 'BP비(Q)');
-            
-            let html = `
-                <thead>
-                    <tr class="bg-primary text-white text-center font-bold">
-                        <th class="py-2.5 px-3 border border-slate-600 text-center w-24">7월차 선행</th>
-                        <th class="py-2.5 px-2 border border-slate-600">상반기</th>
-                        <th class="py-2.5 px-2 border border-slate-600">하반기</th>
-                        <th class="py-2.5 px-2 border border-slate-600">연간</th>
-                        <th class="py-2.5 px-2 border border-slate-600">${ratioColName}</th>
-                        <th class="py-2.5 px-2 border border-slate-600">${ratioQColName}</th>
-                        <th class="py-2.5 px-2 border border-slate-600">이동비</th>
-                        <th class="py-2.5 px-2 border border-slate-600">전년비</th>
-                    </tr>
-                </thead>
-                <tbody>
+        segsToShow.forEach(seg => {
+          const segObj = entData.segments[seg.id];
+          // Section Separator Row
+          tbodyHtml += `
+            <tr class="row-section-hdr">
+              <td class="sticky-col-1 font-bold">${seg.label}</td>
+              <td class="sticky-col-2 font-bold" colspan="1">▼ ${seg.label} 손익 상세</td>
+              <td colspan="${allCols.length}"></td>
+            </tr>
+          `;
+          segMetricsToShow.forEach(sm => {
+            const isHighlight = ['qty', 'nSales', 'coi', 'coiRate', 'mp', 'mpRate'].includes(sm.key);
+            tbodyHtml += `
+              <tr class="${isHighlight ? 'row-highlight' : ''}">
+                <td class="sticky-col-1 text-slate-600 font-semibold">${seg.label}</td>
+                <td class="sticky-col-2 ${isHighlight ? 'font-bold text-slate-900' : 'text-slate-700'}">
+                  <div class="flex items-center justify-between">
+                    <span>${sm.label}</span>
+                    <span class="text-[10px] text-slate-400 num-mono ml-1">${sm.unit}</span>
+                  </div>
+                </td>
+                ${renderCellsForRow(segObj[sm.key], sm.format, sm.yoyMode)}
+              </tr>
             `;
-            
-            if (!rowsData || rowsData.length === 0) {
-                html += `<tr><td colspan="8" class="text-center py-6 text-slate-400">데이터가 없습니다.</td></tr></tbody>`;
-                tableEl.innerHTML = html;
-                return;
+          });
+        });
+      }
+
+      document.getElementById('tab2-matrix-table').innerHTML = thead + `<tbody>${tbodyHtml}</tbody>`;
+    }
+
+    // =========================================================================
+    // TAB 3 RENDERING: Strategic Product Segments Deep-Dive
+    // =========================================================================
+    function renderTab3Controls() {
+      // Period chips
+      document.getElementById('tab3-period-chips').innerHTML = PERIOD_OPTIONS.map(p => {
+        const active = p.id === state.tab3Period;
+        return `<button onclick="state.tab3Period='${p.id}'; renderTab3();" class="px-2.5 py-1 rounded text-xs font-semibold border transition ${active ? 'chip-active' : 'chip-inactive'}">${p.label}</button>`;
+      }).join('');
+
+      // Entity dropdown
+      const sel = document.getElementById('tab3-entity-select');
+      if (!sel.innerHTML) {
+        sel.innerHTML = ENTITIES.map(e => `<option value="${e.id}">${e.nameKo} (${e.id})</option>`).join('');
+      }
+      sel.value = state.tab3Entity;
+
+      // Segment selector chips for Cross Table
+      document.getElementById('tab3-seg-selector-chips').innerHTML = SEGMENTS.map(s => {
+        const active = s.id === state.tab3Segment;
+        return `<button onclick="state.tab3Segment='${s.id}'; renderTab3();" class="px-2.5 py-1 rounded text-xs font-semibold border transition ${active ? 'chip-active' : 'chip-inactive'}">${s.label}</button>`;
+      }).join('');
+    }
+
+    function renderTab3() {
+      state.tab3Entity = document.getElementById('tab3-entity-select')?.value || state.tab3Entity || 'EU';
+      renderTab3Controls();
+
+      const pObj = getPeriodObj(state.tab3Period);
+      const entData = DB.data[state.tab3Entity];
+      const ent = entData.meta;
+
+      document.getElementById('t3-chart-ent-label').textContent = `${ent.nameKo} · ${pObj.short}`;
+      document.getElementById('t3-portfolio-title').textContent = `${ent.nameKo} (${ent.id}) · ${pObj.label}`;
+
+      // 1. Render Portfolio Chart
+      const segLabels = SEGMENTS.map(s => s.label);
+      const segSales = SEGMENTS.map(s => Number((entData.segments[s.id].nSales[pObj.id] || 0).toFixed(1)));
+      const segCoiRates = SEGMENTS.map(s => Number(((entData.segments[s.id].coiRate[pObj.id] || 0) * 100).toFixed(1)));
+      const segMpRates = SEGMENTS.map(s => Number(((entData.segments[s.id].mpRate[pObj.id] || 0) * 100).toFixed(1)));
+
+      if (chartSegPortfolioInstance) chartSegPortfolioInstance.destroy();
+      const ctx3 = document.getElementById('chart-seg-portfolio').getContext('2d');
+      chartSegPortfolioInstance = new Chart(ctx3, {
+        type: 'bar',
+        data: {
+          labels: segLabels,
+          datasets: [
+            {
+              type: 'bar',
+              label: 'N.매출 ($M)',
+              data: segSales,
+              backgroundColor: SEGMENTS.map(s => s.id === state.tab3Segment ? '#0D9488' : '#1E293B'),
+              yAxisID: 'y',
+              borderRadius: 3
+            },
+            {
+              type: 'line',
+              label: 'COI (%)',
+              data: segCoiRates,
+              borderColor: '#EF4444',
+              backgroundColor: '#EF4444',
+              borderWidth: 2,
+              yAxisID: 'y1'
+            },
+            {
+              type: 'line',
+              label: '한계이익률 MP (%)',
+              data: segMpRates,
+              borderColor: '#3B82F6',
+              backgroundColor: '#3B82F6',
+              borderWidth: 2,
+              borderDash: [4, 3],
+              yAxisID: 'y1'
             }
-            
-            rowsData.forEach(r => {
-                const isEUTTL = (r.entity === 'EU TTL');
-                const rowBgClass = isEUTTL ? 'bg-slate-100/90 font-bold border-b-2 border-slate-300' : 'hover:bg-slate-50 border-b border-slate-100';
-                const entityTdClass = isEUTTL ? 'font-black text-slate-900 text-xs' : 'font-bold text-slate-700';
-                
-                // 1. Ratio Cell Highlight (BP비 or SG비): 100% 미만일 때 분홍색 하이라이트
-                let ratioVal = r.bp_sg_ratio || '-';
-                let ratioClass = '';
-                if (ratioVal.endsWith('%')) {
-                    const numPct = parseFloat(ratioVal.replace('%', ''));
-                    if (!isNaN(numPct) && numPct < 100) {
-                        ratioClass = 'bg-rose-100 text-rose-700 font-bold';
-                    }
-                }
-                
-                // 2. Ratio(Q) Cell (BP비(Q) or SG비(Q)): ↓ 화살표 또는 노란색 하이라이트
-                let ratioQVal = r.bp_sg_q || '-';
-                let ratioQClass = '';
-                if (ratioQVal.includes('↓')) {
-                    // 노란색 배경 하이라이트 조건 (DG, FS, UK 등 10k 이상 차이나는 큰 차감 항목 또는 이미지와 동일)
-                    if (isEUTTL || ratioQVal.startsWith('34.5') || ratioQVal.startsWith('14.2') || ratioQVal.startsWith('41.2')) {
-                        ratioQClass = 'bg-amber-300/80 text-rose-600 font-black';
-                    } else {
-                        ratioQClass = 'text-rose-600 font-bold';
-                    }
-                } else if (ratioQVal.includes('↑')) {
-                    ratioQClass = 'text-slate-900';
-                }
-                
-                // 3. Moving Diff Cell (이동비): ↓ 일 때 마이너스 악화이므로 빨간색
-                let movVal = r.mov_diff || '-';
-                let movClass = '';
-                if (movVal.includes('↓')) {
-                    movClass = 'text-rose-600 font-bold';
-                }
-                
-                // 4. YoY Cell (전년비): MRGB일 때 빗금/회색 음영, Δ 마이너스 일 때 빨간색
-                let yoyVal = r.yoy || '-';
-                let yoyClass = '';
-                if (isMRGB) {
-                    yoyVal = '';
-                    yoyClass = 'bg-slate-300/60';
-                } else if (yoyVal.includes('Δ')) {
-                    yoyClass = 'text-rose-600 font-bold';
-                }
-                
-                html += `
-                    <tr class="${rowBgClass}">
-                        <td class="py-2 px-3 border border-slate-200 text-left ${entityTdClass}">${r.entity}</td>
-                        <td class="py-2 px-2 border border-slate-200 text-right font-mono">${r.h1}</td>
-                        <td class="py-2 px-2 border border-slate-200 text-right font-mono">${r.h2}</td>
-                        <td class="py-2 px-2 border border-slate-200 text-right font-mono ${isEUTTL ? 'font-bold' : ''}">${r.year}</td>
-                        <td class="py-2 px-2 border border-slate-200 text-right font-mono ${ratioClass}">${ratioVal}</td>
-                        <td class="py-2 px-2 border border-slate-200 text-right font-mono ${ratioQClass}">${ratioQVal}</td>
-                        <td class="py-2 px-2 border border-slate-200 text-right font-mono ${movClass}">${movVal}</td>
-                        <td class="py-2 px-2 border border-slate-200 text-right font-mono ${yoyClass}">${yoyVal}</td>
-                    </tr>
-                `;
-            });
-            
-            html += `</tbody>`;
-            tableEl.innerHTML = html;
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+          },
+          scales: {
+            x: { ticks: { font: { size: 10 } } },
+            y: { position: 'left', title: { display: true, text: 'N.매출 ($M)', font: { size: 11 } } },
+            y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: '이익률 (%)', font: { size: 11 } } }
+          }
         }
-
-        // Render Exact Cell Text with Color Styling
-        function renderCellText(textStr) {
-            if (textStr === null || textStr === undefined || textStr === '' || textStr === '-') return '-';
-            if (typeof textStr === 'number') {
-                textStr = textStr.toLocaleString('en-US');
-            }
-            const str = String(textStr);
-            if (str.includes('↑') || (str.startsWith('+') && !str.includes('p↑'))) {
-                return `<span class="text-up">${str}</span>`;
-            }
-            if (str.includes('↓') || str.includes('Δ') || (str.startsWith('-') && str !== '-')) {
-                return `<span class="text-down">${str}</span>`;
-            }
-            return str;
-        }
-
-        // ==================== TAB 1: EXECUTIVE OVERVIEW RENDERER ====================
-        function renderOverviewTab() {
-            const selectedMetric = document.getElementById('filter-metric')?.value || '제상품';
-
-            let metricsData = dashboardData?.eu_ttl_metrics;
-
-            // Dynamic 2nd Fallback Safety Net: if eu_ttl_metrics is missing in cached data, generate on-the-fly from excel_reports
-            if ((!metricsData || !metricsData[selectedMetric]) && dashboardData?.excel_reports) {
-                metricsData = metricsData || {};
-                const METRIC_MAP = {
-                    '제상품': { key: 'jesang', valIdx: 0, yoyIdx: 1, movDiffIdx: 5, fmt: (v)=> (v/1000000).toFixed(1)+'M' },
-                    '차감': { key: 'chagam', valIdx: 0, yoyIdx: 1, movDiffIdx: 5, fmt: (v)=> (v*100).toFixed(1)+'%' },
-                    '판가인하': { key: 'panga', valIdx: 0, yoyIdx: 1, movDiffIdx: 4, fmt: (v)=> (v*100).toFixed(1)+'%' },
-                    '영업이익': { key: 'coi', valIdx: 0, yoyIdx: 1, movDiffIdx: 5, fmt: (v)=> (v/1000).toFixed(0)+'K' },
-                    'COI': { key: 'coi', valIdx: 0, yoyIdx: 1, movDiffIdx: 5, fmt: (v)=> (v/1000).toFixed(0)+'K' },
-                    '영업이익율': { key: 'coiPct', valIdx: 0, yoyIdx: 1, movDiffIdx: 5, fmt: (v)=> (v*100).toFixed(1)+'%' },
-                    'COI%': { key: 'coiPct', valIdx: 0, yoyIdx: 1, movDiffIdx: 5, fmt: (v)=> (v*100).toFixed(1)+'%' },
-                    '한계이익율': { key: 'mpPct', valIdx: 0, yoyIdx: 1, movDiffIdx: 4, fmt: (v)=> (v*100).toFixed(1)+'%' },
-                    'MP%': { key: 'mpPct', valIdx: 0, yoyIdx: 1, movDiffIdx: 4, fmt: (v)=> (v*100).toFixed(1)+'%' },
-                    '수량': { key: 'qty', valIdx: 0, yoyIdx: 1, movDiffIdx: 4, fmt: (v)=> (v/1000).toFixed(1)+'k' },
-                    'G.ASP': { key: 'gasp', valIdx: 0, yoyIdx: 1, movDiffIdx: 4, fmt: (v)=> Math.round(v) },
-                    'N.ASP': { key: 'nasp', valIdx: 0, yoyIdx: 1, movDiffIdx: 4, fmt: (v)=> Math.round(v) }
-                };
-
-                const cfg = METRIC_MAP[selectedMetric] || METRIC_MAP['제상품'];
-                const CODES = ['DG', 'AG', 'BN', 'CK', 'ES', 'FS', 'HS', 'IS', 'LA', 'MK', 'PL', 'PT', 'RO', 'SW', 'UK', 'Swiss'];
-                const NAME_MAP = { 'DG': 'LGEDG', 'AG': 'LGEAG', 'BN': 'LGEBN', 'CK': 'LGECK', 'ES': 'LGEES', 'FS': 'LGEFS', 'HS': 'LGEHS', 'IS': 'LGEIS', 'LA': 'LGELA', 'MK': 'LGEMK', 'PL': 'LGEPL', 'PT': 'LGEPT', 'RO': 'LGERO', 'SW': 'LGESW', 'UK': 'LGEUK', 'Swiss': 'Swiss' };
-
-                const rows = [];
-                CODES.forEach(code => {
-                    const dashKey = NAME_MAP[code];
-                    const t1 = dashboardData.excel_reports[dashKey]?.table1;
-                    if (!t1 || !t1[cfg.key]) return;
-
-                    const vals = t1[cfg.key][cfg.valIdx] || [];
-                    const yoys = t1[cfg.key][cfg.yoyIdx] || [];
-                    const movDiffs = t1[cfg.key][cfg.movDiffIdx] || [];
-
-                    const fmt = cfg.fmt || ((v)=>v);
-                    const fmtY = (v)=> v ? (v > 0 ? '+' : '') + (v*100).toFixed(0)+'%' : '-';
-                    const fmtM = (v)=> v !== undefined ? (v > 0 ? '+' : '') + (typeof v === 'number' && Math.abs(v)<1 ? (v*100).toFixed(1)+'%' : Math.round(v)) : '-';
-
-                    rows.push({
-                        entity: code,
-                        entity_name: `${dashKey} (${code})`,
-                        m07:  { val: fmt(vals[1]), movingDiff: fmtM(movDiffs[1]), yoy: fmtY(yoys[1]) },
-                        m08:  { val: fmt(vals[2]), movingDiff: fmtM(movDiffs[2]), yoy: fmtY(yoys[2]) },
-                        m09:  { val: fmt(vals[3]), movingDiff: fmtM(movDiffs[3]), yoy: fmtY(yoys[3]) },
-                        q3:   { val: fmt(vals[4]), movingDiff: fmtM(movDiffs[4]), yoy: fmtY(yoys[4]) },
-                        m10:  { val: fmt(vals[5]), movingDiff: fmtM(movDiffs[5]), yoy: fmtY(yoys[5]) },
-                        m11:  { val: fmt(vals[6]), movingDiff: fmtM(movDiffs[6]), yoy: fmtY(yoys[6]) },
-                        m12:  { val: fmt(vals[7]), movingDiff: fmtM(movDiffs[7]), yoy: fmtY(yoys[7]) },
-                        q4:   { val: fmt(vals[8]), movingDiff: fmtM(movDiffs[8]), yoy: fmtY(yoys[8]) },
-                        year: { val: fmt(vals[10]), yoy: fmtY(yoys[10]) }
-                    });
-                });
-                metricsData[selectedMetric] = rows;
-            }
-
-            if (!metricsData || !metricsData[selectedMetric]) {
-                document.getElementById('table-overview-metric').innerHTML = '<tbody><tr><td class="p-4 text-center">데이터가 없습니다.</td></tr></tbody>';
-                return;
-            }
-
-            document.getElementById('overview-table-title').innerText = `법인별 지표 점검표 - [ ${selectedMetric} ]`;
-
-            const rowsList = metricsData[selectedMetric];
-
-            let html = `
-                <thead>
-                    <tr>
-                        <th rowspan="2" class="sticky-col">${selectedMetric}</th>
-                        <th colspan="3">7월</th>
-                        <th colspan="3">8월</th>
-                        <th colspan="3">9월</th>
-                        <th colspan="3" class="bg-summary">3분기</th>
-                        <th colspan="3">10월</th>
-                        <th colspan="3">11월</th>
-                        <th colspan="3">12월</th>
-                        <th colspan="3" class="bg-summary">4분기</th>
-                        <th colspan="2" class="bg-summary">연간</th>
-                    </tr>
-                    <tr>
-                        <!-- 7월 -->
-                        <th>값</th><th>이동비</th><th>전년비</th>
-                        <!-- 8월 -->
-                        <th>값</th><th>이동비</th><th>전년비</th>
-                        <!-- 9월 -->
-                        <th>값</th><th>이동비</th><th>전년비</th>
-                        <!-- 3분기 -->
-                        <th class="bg-summary">값</th><th class="bg-summary">이동비</th><th class="bg-summary">전년비</th>
-                        <!-- 10월 -->
-                        <th>값</th><th>이동비</th><th>전년비</th>
-                        <!-- 11월 -->
-                        <th>값</th><th>이동비</th><th>전년비</th>
-                        <!-- 12월 -->
-                        <th>값</th><th>이동비</th><th>전년비</th>
-                        <!-- 4분기 -->
-                        <th class="bg-summary">값</th><th class="bg-summary">이동비</th><th class="bg-summary">전년비</th>
-                        <!-- 연간 -->
-                        <th class="bg-summary">값</th><th class="bg-summary">전년비</th>
-                    </tr>
-                </thead>
-                <tbody>
-            `;
-
-            rowsList.forEach(r => {
-                const isTotal = r.entity === 'EU TTL';
-                
-                // Yellow Highlight condition matching exact excel image for 3분기 이동비
-                const isYellowCell = (selectedMetric === '판가인하' || selectedMetric === '제상품') && 
-                                     (r.entity === 'AG' || r.entity === 'ES' || r.entity === 'LA' || r.entity === 'DG');
-
-                html += `
-                    <tr class="${isTotal ? 'bg-slate-100 font-bold' : ''}">
-                        <td class="sticky-col ${isTotal ? 'font-bold text-primary bg-slate-100' : ''}">${r.entity}</td>
-                        
-                        <!-- 7월 -->
-                        <td class="font-bold">${renderCellText(r.m07.val)}</td>
-                        <td>${renderCellText(r.m07.movingDiff)}</td>
-                        <td>${renderCellText(r.m07.yoy)}</td>
-
-                        <!-- 8월 -->
-                        <td class="font-bold">${renderCellText(r.m08.val)}</td>
-                        <td>${renderCellText(r.m08.movingDiff)}</td>
-                        <td>${renderCellText(r.m08.yoy)}</td>
-
-                        <!-- 9월 -->
-                        <td class="font-bold">${renderCellText(r.m09.val)}</td>
-                        <td>${renderCellText(r.m09.movingDiff)}</td>
-                        <td>${renderCellText(r.m09.yoy)}</td>
-
-                        <!-- 3분기 -->
-                        <td class="bg-summary font-bold">${renderCellText(r.q3.val)}</td>
-                        <td class="bg-summary ${isYellowCell ? 'bg-highlight-yellow' : ''}">${renderCellText(r.q3.movingDiff)}</td>
-                        <td class="bg-summary">${renderCellText(r.q3.yoy)}</td>
-
-                        <!-- 10월 -->
-                        <td class="font-bold">${renderCellText(r.m10.val)}</td>
-                        <td>${renderCellText(r.m10.movingDiff)}</td>
-                        <td>${renderCellText(r.m10.yoy)}</td>
-
-                        <!-- 11월 -->
-                        <td class="font-bold">${renderCellText(r.m11.val)}</td>
-                        <td>${renderCellText(r.m11.movingDiff)}</td>
-                        <td>${renderCellText(r.m11.yoy)}</td>
-
-                        <!-- 12월 -->
-                        <td class="font-bold">${renderCellText(r.m12.val)}</td>
-                        <td>${renderCellText(r.m12.movingDiff)}</td>
-                        <td>${renderCellText(r.m12.yoy)}</td>
-
-                        <!-- 4분기 -->
-                        <td class="bg-summary font-bold">${renderCellText(r.q4.val)}</td>
-                        <td class="bg-summary">${renderCellText(r.q4.movingDiff)}</td>
-                        <td class="bg-summary">${renderCellText(r.q4.yoy)}</td>
-
-                        <!-- 연간 -->
-                        <td class="bg-summary font-bold">${renderCellText(r.year.val)}</td>
-                        <td class="bg-summary">${renderCellText(r.year.yoy)}</td>
-                    </tr>
-                `;
-            });
-
-            html += '</tbody>';
-            document.getElementById('table-overview-metric').innerHTML = html;
-        }
-
-        // ==================== TAB 2: 법인별 수익성 분석 RENDERER ====================
-        const entityCodeMap = {
-            'LGEAG': 'LGEAG',
-            'LGEBN': 'LGEBN',
-            'LGECK': 'LGECK',
-            'LGEDG': 'LGEDG',
-            'Swiss': 'Swiss',
-            'LGEES': 'LGEES',
-            'LGEFS': 'LGEFS',
-            'LGEHS': 'LGEHS',
-            'LGEIS': 'LGEIS',
-            'LGELA': 'LGELA',
-            'LGEMK': 'LGEMK',
-            'LGEPL': 'LGEPL',
-            'LGEPT': 'LGEPT',
-            'LGERO': 'LGERO',
-            'LGESW': 'LGESW',
-            'LGEUK': 'LGEUK'
-        };
-
-        function renderSubsidiaryTab() {
-            const selectedSub = document.getElementById('filter-sub')?.value || 'LGEDG';
-            const subSelectEl = document.getElementById('filter-sub');
-            const selectedSubText = subSelectEl ? subSelectEl.options[subSelectEl.selectedIndex]?.text : selectedSub;
-
-            const reports = dashboardData?.excel_reports || {};
-            let subData = reports[selectedSub] || reports[entityCodeMap[selectedSub]] || reports['LGEDG'];
-
-            const titleEl = document.getElementById('subsidiary-table-title');
-            if (titleEl) titleEl.innerText = `법인별 손익 Summary 점검표 - [ ${selectedSubText} ]`;
-
-            // Render Table 1: PnL Summary Table
-            renderTable1PnL(subData ? subData.table1 : null);
-            
-            // Render Table 2: BLU Segment Table
-            renderTable2BLU(subData ? subData.table2 : null, subData ? subData.table1 : null);
-        }
-
-        function fmtValue(val, type, isSubRow = false) {
-            if (val === null || val === undefined || val === '' || val === '-') return '-';
-            
-            if (typeof val === 'number') {
-                if (isSubRow) {
-                    if (type === 'pct_delta' || type === 'pct') {
-                        const pct = (val * 100).toFixed(1);
-                        if (val < 0) return `<span class="cell-sub-val">Δ${Math.abs(pct)}%</span>`;
-                        return `<span class="cell-sub-val">${pct}%</span>`;
-                    }
-                    if (type === 'pctp_arrow') {
-                        const absVal = Math.abs(val * 100).toFixed(1);
-                        if (val < 0) return `<span class="cell-sub-val">${absVal}p↓</span>`;
-                        if (val > 0) return `<span class="cell-sub-val">${absVal}p↑</span>`;
-                        return `<span class="cell-sub-val">0.0p</span>`;
-                    }
-                    if (type === 'unit_k_delta') { // 소수점 한자리 delta 포맷팅 (수량/제상품 이동비)
-                        const str = Math.abs(val).toFixed(1);
-                        if (val < 0) return `<span class="cell-sub-val">Δ${str}</span>`;
-                        if (val > 0) return `<span class="cell-sub-val">+${str}</span>`;
-                        return `<span class="cell-sub-val">0.0</span>`;
-                    }
-                    if (type === 'unit_k') {
-                        const str = Math.abs(val).toFixed(1);
-                        if (val < 0) return `<span class="cell-sub-val">Δ${str}</span>`;
-                        return `<span class="cell-sub-val">${str}</span>`;
-                    }
-                    if (type === 'int') {
-                        return `<span class="cell-sub-val">${Math.round(val).toLocaleString()}</span>`;
-                    }
-                    return `<span class="cell-sub-val">${val.toLocaleString()}</span>`;
-                }
-
-                if (type === 'pct_delta' || type === 'pct') {
-                    const pct = (val * 100).toFixed(1);
-                    if (val < 0) return `<span class="text-rose-600 font-bold">Δ${Math.abs(pct)}%</span>`;
-                    return `<span class="font-bold text-slate-900">${pct}%</span>`;
-                }
-                if (type === 'unit_k') {
-                    const str = val.toFixed(1);
-                    if (val < 0) return `<span class="text-rose-600 font-bold">Δ${Math.abs(val.toFixed(1))}</span>`;
-                    return `<span class="font-bold text-slate-900">${str}</span>`;
-                }
-                if (type === 'int') {
-                    return `<span class="font-bold text-slate-900">${Math.round(val).toLocaleString()}</span>`;
-                }
-                return `<span class="font-bold text-slate-900">${val.toLocaleString()}</span>`;
-            }
-
-            const strVal = String(val);
-
-            if (isSubRow) {
-                return `<span class="cell-sub-val">${strVal}</span>`;
-            }
-
-            if (strVal.includes('↑') || (strVal.startsWith('+') && !strVal.includes('p↑'))) {
-                return `<span class="text-blue-600 font-bold">${strVal}</span>`;
-            }
-            if (strVal.includes('↓') || strVal.includes('Δ') || (strVal.startsWith('-') && strVal !== '-')) {
-                return `<span class="text-rose-600 font-bold">${strVal}</span>`;
-            }
-
-            return `<span class="font-bold text-slate-900">${strVal}</span>`;
-        }
-
-        function renderTable1PnL(t1) {
-            const tableEl = document.getElementById('table-pnl-excel');
-            if (!tableEl) return;
-
-            let html = `
-                <thead>
-                    <tr class="bg-primary text-white border-b border-slate-700 font-bold">
-                        <th class="p-2.5 border-r border-slate-700 text-center w-36 sticky-col">7월차 선행</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">상반기</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">7월</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">8월</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">9월</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center bg-summary font-extrabold">3분기</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">10월</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">11월</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">12월</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center bg-summary">4분기</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">하반기</th>
-                        <th class="p-2.5 text-center bg-summary font-bold">연간</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-200">
-            `;
-
-            const buildRow = (label, values, type, isSubRow = false) => {
-                if (!values || !Array.isArray(values)) return '';
-                const rowBg = isSubRow ? 'bg-slate-50/40 hover:bg-slate-100/50' : 'bg-white font-bold hover:bg-slate-50';
-                let tr = `<tr class="${rowBg}">`;
-                
-                if (isSubRow) {
-                    tr += `<td class="p-2 border-r border-slate-300 text-left sticky-col bg-white">
-                             <div class="metric-sub-title"><span class="text-slate-400 font-mono text-[11px]">└</span> <span>${label}</span></div>
-                           </td>`;
-                } else {
-                    tr += `<td class="p-2 border-r border-slate-300 text-left sticky-col bg-white">
-                             <div class="metric-main-title"><span class="text-slate-800 text-[9px]">▶</span> <span class="font-bold text-slate-900">${label}</span></div>
-                           </td>`;
-                }
-
-                values.forEach((v, idx) => {
-                    const isQ3 = idx === 4;
-                    const q3Bg = isQ3 ? (isSubRow ? 'bg-slate-100/70' : 'bg-slate-100 font-bold') : '';
-                    
-                    // 1. '상반기' 항목 열 (idx === 0)에서 이동비 수치(회색)는 모두 삭제 (빈칸 처리)
-                    const isH1MovingRow = (isSubRow && label === '이동비' && idx === 0);
-                    const cellContent = isH1MovingRow ? '-' : fmtValue(v, type, isSubRow);
-                    
-                    tr += `<td class="p-2 border-r border-slate-300 text-right ${q3Bg}">${cellContent}</td>`;
-                });
-                tr += '</tr>';
-                return tr;
-            };
-
-            const formatK = (arr) => arr ? arr.map(v => typeof v === 'number' ? (v/1000) : v) : null;
-            const formatM = (arr) => arr ? arr.map(v => typeof v === 'number' ? (v/1000000) : v) : null;
-
-            // Section 1: 수량 (소수점 한자리 포맷팅)
-            html += buildRow('수량', formatK(t1?.qty?.[0]), 'unit_k', false);
-            html += buildRow('전년비', t1?.qty?.[1], 'pct_delta', true);
-            html += buildRow('이동비', formatK(t1?.qty?.[4]), 'unit_k_delta', true);
-
-            // Section 2: G.ASP
-            html += buildRow('G.ASP', t1?.gasp?.[0], 'int', false);
-            html += buildRow('전년비', t1?.gasp?.[1], 'arrow', true);
-            html += buildRow('이동비', t1?.gasp?.[4], 'arrow', true);
-
-            // Section 3: 제상품 (소수점 한자리 포맷팅 & SG비 행 삭제)
-            html += buildRow('제상품', formatM(t1?.jesang?.[0]), 'unit_k', false);
-            html += buildRow('전년비', t1?.jesang?.[1], 'pct_delta', true);
-            html += buildRow('이동비', formatM(t1?.jesang?.[5]), 'unit_k_delta', true);
-            // (SG비 행 삭제 완료)
-
-            // Section 4: 차감 (차감 전년비 밑에 이동비 추가)
-            html += buildRow('차감', t1?.chagam?.[0], 'pct', false);
-            html += buildRow('전년비', t1?.chagam?.[1], 'pctp_arrow', true);
-            html += buildRow('이동비', t1?.chagam?.[3], 'pctp_arrow', true);
-
-            // Section 5: N.ASP
-            html += buildRow('N.ASP', t1?.nasp?.[0], 'int', false);
-            html += buildRow('전년비', t1?.nasp?.[1], 'arrow', true);
-
-            // Section 6: 판가인하 (엑셀 수식 동일 적용)
-            html += buildRow('판가인하', t1?.panga?.[0], 'pct', false);
-            html += buildRow('전년비', t1?.panga?.[1], 'pctp_arrow', true);
-            html += buildRow('이동비', t1?.panga?.[2], 'pctp_arrow', true);
-
-            // Section 7: COI
-            html += buildRow('COI', formatM(t1?.coi?.[0]), 'unit_k', false);
-            html += buildRow('전년비', formatM(t1?.coi?.[1]), 'unit_k_delta', true);
-
-            // Section 8: COI(%)
-            html += buildRow('COI(%)', t1?.coiPct?.[0], 'pct_delta', false);
-            html += buildRow('전년비', t1?.coiPct?.[1], 'pctp_arrow', true);
-
-            // Section 9: MP(%)
-            html += buildRow('MP(%)', t1?.mpPct?.[0], 'pct', false);
-            html += buildRow('전년비', t1?.mpPct?.[1], 'pctp_arrow', true);
-
-            html += '</tbody>';
-            tableEl.innerHTML = html;
-        }
-
-        function renderTable2BLU(t2, t1) {
-            const tableEl = document.getElementById('table-blu-excel');
-            if (!tableEl) return;
-
-            let html = `
-                <thead>
-                    <tr class="bg-primary text-white border-b border-slate-700 font-bold">
-                        <th class="p-2.5 border-r border-slate-700 text-center w-36 sticky-col">BLU</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">상반기</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">7월</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">8월</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">9월</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center bg-summary font-extrabold">3분기</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">10월</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">11월</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">12월</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center bg-summary">4분기</th>
-                        <th class="p-2.5 border-r border-slate-700 text-center">하반기</th>
-                        <th class="p-2.5 text-center bg-summary font-bold">연간</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-200">
-            `;
-
-            const buildCategory = (catName, valuesQty, valuesYoy, valuesCoi, valuesCoiYoy) => {
-                let catHtml = '';
-                // Main Category Row
-                catHtml += `<tr class="bg-white font-bold hover:bg-slate-50">`;
-                catHtml += `<td class="p-2 border-r border-slate-300 text-left sticky-col bg-white">
-                             <div class="metric-main-title"><span class="text-slate-800 text-[9px]">▶</span> <span class="font-bold text-slate-900">${catName}</span></div>
-                           </td>`;
-                (valuesQty || Array(11).fill(null)).forEach((v, idx) => {
-                    const q3Bg = idx === 4 ? 'bg-slate-100 font-extrabold' : '';
-                    catHtml += `<td class="p-2 border-r border-slate-300 text-right ${q3Bg}">${fmtValue(v, 'unit_k', false)}</td>`;
-                });
-                catHtml += `</tr>`;
-
-                if (valuesYoy) {
-                    catHtml += `<tr class="bg-slate-50/40 hover:bg-slate-100/50">`;
-                    catHtml += `<td class="p-2 border-r border-slate-300 text-left sticky-col bg-white">
-                                 <div class="metric-sub-title"><span class="text-slate-400 font-mono text-[11px]">└</span> <span>전년비</span></div>
-                               </td>`;
-                    valuesYoy.forEach((v, idx) => {
-                        const q3Bg = idx === 4 ? 'bg-slate-100/70' : '';
-                        catHtml += `<td class="p-2 border-r border-slate-300 text-right ${q3Bg}">${fmtValue(v, 'pct_delta', true)}</td>`;
-                    });
-                    catHtml += `</tr>`;
-                }
-
-                if (valuesCoi) {
-                    catHtml += `<tr class="bg-slate-50/40 hover:bg-slate-100/50">`;
-                    catHtml += `<td class="p-2 border-r border-slate-300 text-left sticky-col bg-white">
-                                 <div class="metric-sub-title"><span class="text-slate-400 font-mono text-[11px]">└</span> <span>COI%</span></div>
-                               </td>`;
-                    valuesCoi.forEach((v, idx) => {
-                        const q3Bg = idx === 4 ? 'bg-slate-100/70' : '';
-                        catHtml += `<td class="p-2 border-r border-slate-300 text-right ${q3Bg}">${fmtValue(v, 'pct', true)}</td>`;
-                    });
-                    catHtml += `</tr>`;
-                }
-
-                if (valuesCoiYoy) {
-                    catHtml += `<tr class="bg-slate-50/40 hover:bg-slate-100/50">`;
-                    catHtml += `<td class="p-2 border-r border-slate-300 text-left sticky-col bg-white">
-                                 <div class="metric-sub-title"><span class="text-slate-400 font-mono text-[11px]">└</span> <span>전년비</span></div>
-                               </td>`;
-                    valuesCoiYoy.forEach((v, idx) => {
-                        const q3Bg = idx === 4 ? 'bg-slate-100/70' : '';
-                        catHtml += `<td class="p-2 border-r border-slate-300 text-right ${q3Bg}">${fmtValue(v, 'pctp_arrow', true)}</td>`;
-                    });
-                    catHtml += `</tr>`;
-                }
-
-                return catHtml;
-            };
-
-            const dgQtyBase = [259.5, 32.6, 34.3, 60.9, 127.8, 126.5, 75.5, 54.5, 256.5, 384.3, 643.8];
-            const currQtyArr = t1?.qty?.[0] ? t1.qty[0].map(v => typeof v === 'number' ? (v > 1000 ? v/1000 : v) : (parseFloat(v)||0)) : dgQtyBase;
-            const qtyRatios = currQtyArr.map((q, i) => (dgQtyBase[i] > 0 && q > 0) ? (q / dgQtyBase[i]) : 1);
-
-            const baseOled = [134.2, 16.5, 11.2, 25.6, 53.3, 69.6, 39.2, 24.3, 133.1, 186.4, 320.6];
-            const baseMrgb = [2.6, 2.1, 1.0, 1.5, 4.6, 1.8, 2.3, 1.3, 5.3, 9.9, 12.5];
-            const baseQned = [68.5, 7.8, 9.9, 19.4, 37.0, 36.2, 18.2, 13.5, 67.9, 105.0, 173.5];
-            const baseUhd  = [33.6, 4.7, 11.2, 12.1, 28.0, 16.6, 13.9, 13.4, 43.9, 71.9, 105.6];
-            const baseFhd  = [16.0, 1.6, 1.0, 2.3, 4.9, 2.3, 2.0, 2.0, 6.3, 11.1, 27.1];
-
-            const dynOledQty = t2?.oled?.[0] && t2.oled[0].some(v => v > 0) ? t2.oled[0].map(v => v/1000) : baseOled.map((v, i) => Math.round(v * qtyRatios[i] * 10) / 10);
-            const dynMrgbQty = t2?.mrgb?.[0] && t2.mrgb[0].some(v => v > 0) ? t2.mrgb[0].map(v => v/1000) : baseMrgb.map((v, i) => Math.round(v * qtyRatios[i] * 10) / 10);
-            const dynQnedQty = t2?.qned?.[0] && t2.qned[0].some(v => v > 0) ? t2.qned[0].map(v => v/1000) : baseQned.map((v, i) => Math.round(v * qtyRatios[i] * 10) / 10);
-            const dynUhdQty  = t2?.uhd?.[0] && t2.uhd[0].some(v => v > 0)  ? t2.uhd[0].map(v => v/1000)  : baseUhd.map((v, i)  => Math.round(v * qtyRatios[i] * 10) / 10);
-            const dynFhdQty  = t2?.fhdStv?.[0] && t2.fhdStv[0].some(v => v > 0) ? t2.fhdStv[0].map(v => v/1000) : baseFhd.map((v, i)  => Math.round(v * qtyRatios[i] * 10) / 10);
-
-            html += buildCategory('OLED', dynOledQty, t2?.oled?.[1], t2?.oled?.[2], t2?.oled?.[3]);
-            html += buildCategory('MRGB', dynMrgbQty, null, t2?.mrgb?.[2], null);
-            html += buildCategory('QNED', dynQnedQty, t2?.qned?.[1], t2?.qned?.[2], t2?.qned?.[3]);
-            html += buildCategory('UHD', dynUhdQty, t2?.uhd?.[1], t2?.uhd?.[2], t2?.uhd?.[3]);
-            html += buildCategory('FHD+STV', dynFhdQty, t2?.fhdStv?.[1], t2?.fhdStv?.[2], t2?.fhdStv?.[3]);
-
-            html += '</tbody>';
-            tableEl.innerHTML = html;
-        }
-    </script>
-
-
+      });
+
+      // 2. Render 10 Segments Portfolio Table
+      const portfolioThead = `
+        <thead>
+          <tr>
+            <th class="sticky-col-1">제품군 (BLU)</th>
+            <th>수량(K)</th>
+            <th>전년비</th>
+            <th>N.매출($M)</th>
+            <th>9월선행비</th>
+            <th>전년비</th>
+            <th>매출비중</th>
+            <th>차감(%)</th>
+            <th>ASP($)</th>
+            <th>COI($M)</th>
+            <th>9월선행비</th>
+            <th>COI(%)</th>
+            <th>한계이익($M)</th>
+            <th>MP(%)</th>
+          </tr>
+        </thead>
+      `;
+
+      const portfolioRows = SEGMENTS.map(seg => {
+        const s = entData.segments[seg.id];
+        const isSelected = seg.id === state.tab3Segment;
+        return `
+          <tr onclick="state.tab3Segment='${seg.id}'; renderTab3();" class="cursor-pointer ${isSelected ? 'row-eu-total' : ''}">
+            <td class="sticky-col-1 font-bold text-slate-900">${seg.label}</td>
+            <td class="text-right num-mono">${fmtVal(s.qty[pObj.id], 'qty')}</td>
+            <td class="text-right num-mono col-var">${pObj.yoyKey ? fmtVar(s.qty[pObj.yoyKey], 'qty', true) : '-'}</td>
+            <td class="text-right num-mono font-semibold">${fmtVal(s.nSales[pObj.id], 'amt')}</td>
+            <td class="text-right num-mono col-var">${pObj.prevKey ? fmtVar(s.nSales[pObj.prevKey], 'amt', false) : '-'}</td>
+            <td class="text-right num-mono col-var">${pObj.yoyKey ? fmtVar(s.nSales[pObj.yoyKey], 'amt', true) : '-'}</td>
+            <td class="text-right num-mono font-semibold">${fmtVal(s.mixRate[pObj.id], 'pct')}</td>
+            <td class="text-right num-mono">${fmtVal(s.sdRate[pObj.id], 'pct')}</td>
+            <td class="text-right num-mono">${fmtVal(s.asp[pObj.id], 'asp')}</td>
+            <td class="text-right num-mono font-semibold">${fmtVal(s.coi[pObj.id], 'amt')}</td>
+            <td class="text-right num-mono col-var">${pObj.prevKey ? fmtVar(s.coi[pObj.prevKey], 'amt', false) : '-'}</td>
+            <td class="text-right num-mono font-semibold">${fmtVal(s.coiRate[pObj.id], 'pct')}</td>
+            <td class="text-right num-mono">${fmtVal(s.mp[pObj.id], 'amt')}</td>
+            <td class="text-right num-mono">${fmtVal(s.mpRate[pObj.id], 'pct')}</td>
+          </tr>
+        `;
+      }).join('');
+      document.getElementById('tab3-portfolio-table').innerHTML = portfolioThead + `<tbody>${portfolioRows}</tbody>`;
+
+      // 3. Render Selected Segment x 16 Subsidiaries/Countries Cross Table
+      const selSegObj = SEGMENTS.find(s => s.id === state.tab3Segment) || SEGMENTS[0];
+      const crossThead = `
+        <thead>
+          <tr>
+            <th rowspan="2" class="sticky-col-1" style="min-width:115px;">조직 (코드)</th>
+            <th rowspan="2" class="sticky-col-2" style="min-width:85px;">원천 시트</th>
+            <th colspan="4">${selSegObj.label} — 수량 (천대)</th>
+            <th colspan="2">G.매출 & 차감</th>
+            <th colspan="4">${selSegObj.label} — N.매출 (백만불)</th>
+            <th rowspan="2">법인내<br/>매출비중</th>
+            <th rowspan="2">ASP<br/>($/대)</th>
+            <th colspan="4">${selSegObj.label} — 영업이익 COI ($M)</th>
+            <th rowspan="2">COI%</th>
+            <th colspan="3">${selSegObj.label} — 한계이익 MP ($M)</th>
+            <th rowspan="2">MP%</th>
+          </tr>
+          <tr>
+            <th>실적/선행</th>
+            <th class="text-teal-300">이동비</th>
+            <th class="text-sky-300">9월선행비</th>
+            <th class="text-amber-300">전년비</th>
+            <th>G.매출($M)</th>
+            <th>차감(%)</th>
+            <th>실적/선행</th>
+            <th class="text-teal-300">이동비</th>
+            <th class="text-sky-300">9월선행비</th>
+            <th class="text-amber-300">전년비</th>
+            <th>실적/선행</th>
+            <th class="text-teal-300">이동비</th>
+            <th class="text-sky-300">9월선행비</th>
+            <th class="text-amber-300">전년비</th>
+            <th>실적/선행</th>
+            <th class="text-sky-300">9월선행비</th>
+            <th class="text-amber-300">전년비</th>
+          </tr>
+        </thead>
+      `;
+
+      const crossRows = ENTITIES.map(e => {
+        const s = DB.data[e.id].segments[selSegObj.id];
+        const isEu = e.id === 'EU';
+        const sheetBadgeClass = e.sheet === '지역별'
+          ? 'bg-slate-900 text-white'
+          : (e.sheet === '국가별' ? 'bg-teal-700 text-white' : 'bg-slate-100 text-slate-700 border border-slate-300');
+
+        return `
+          <tr onclick="state.tab2Entity='${e.id}'; state.tab2SegmentFilter='${selSegObj.id}'; switchMainTab(2);" class="cursor-pointer ${isEu ? 'row-eu-total' : ''}">
+            <td class="sticky-col-1 font-semibold text-slate-900">
+              <div class="flex items-center justify-between">
+                <span>${e.nameKo}</span>
+                <span class="text-[10px] text-slate-500 num-mono ml-1">${e.id}</span>
+              </div>
+            </td>
+            <td class="sticky-col-2 text-center">
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${sheetBadgeClass}">${e.sheet}</span>
+            </td>
+            <td class="text-right num-mono font-semibold col-forecast">${fmtVal(s.qty[pObj.id], 'qty')}</td>
+            <td class="text-right num-mono col-var">${pObj.mpKey ? fmtVar(s.qty[pObj.mpKey], 'qty', false) : '-'}</td>
+            <td class="text-right num-mono col-var">${pObj.prevKey ? fmtVar(s.qty[pObj.prevKey], 'qty', false) : '-'}</td>
+            <td class="text-right num-mono col-var">${pObj.yoyKey ? fmtVar(s.qty[pObj.yoyKey], 'qty', true) : '-'}</td>
+
+            <td class="text-right num-mono">${fmtVal(s.gSales[pObj.id], 'amt')}</td>
+            <td class="text-right num-mono">${fmtVal(s.sdRate[pObj.id], 'pct')}</td>
+
+            <td class="text-right num-mono font-semibold col-forecast">${fmtVal(s.nSales[pObj.id], 'amt')}</td>
+            <td class="text-right num-mono col-var">${pObj.mpKey ? fmtVar(s.nSales[pObj.mpKey], 'amt', false) : '-'}</td>
+            <td class="text-right num-mono col-var">${pObj.prevKey ? fmtVar(s.nSales[pObj.prevKey], 'amt', false) : '-'}</td>
+            <td class="text-right num-mono col-var">${pObj.yoyKey ? fmtVar(s.nSales[pObj.yoyKey], 'amt', true) : '-'}</td>
+
+            <td class="text-right num-mono font-semibold">${fmtVal(s.mixRate[pObj.id], 'pct')}</td>
+            <td class="text-right num-mono">${fmtVal(s.asp[pObj.id], 'asp')}</td>
+
+            <td class="text-right num-mono font-semibold col-forecast">${fmtVal(s.coi[pObj.id], 'amt')}</td>
+            <td class="text-right num-mono col-var">${pObj.mpKey ? fmtVar(s.coi[pObj.mpKey], 'amt', false) : '-'}</td>
+            <td class="text-right num-mono col-var">${pObj.prevKey ? fmtVar(s.coi[pObj.prevKey], 'amt', false) : '-'}</td>
+            <td class="text-right num-mono col-var">${pObj.yoyKey ? fmtVar(s.coi[pObj.yoyKey], 'amt', false) : '-'}</td>
+            <td class="text-right num-mono font-semibold">${fmtVal(s.coiRate[pObj.id], 'pct')}</td>
+
+            <td class="text-right num-mono font-semibold col-forecast">${fmtVal(s.mp[pObj.id], 'amt')}</td>
+            <td class="text-right num-mono col-var">${pObj.prevKey ? fmtVar(s.mp[pObj.prevKey], 'amt', false) : '-'}</td>
+            <td class="text-right num-mono col-var">${pObj.yoyKey ? fmtVar(s.mp[pObj.yoyKey], 'amt', false) : '-'}</td>
+            <td class="text-right num-mono font-semibold">${fmtVal(s.mpRate[pObj.id], 'pct')}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('tab3-cross-table').innerHTML = crossThead + `<tbody>${crossRows}</tbody>`;
+    }
+
+    // =========================================================================
+    // CSV Export Utility
+    // =========================================================================
+    function exportTableToCSV(tableId, filename) {
+      const table = document.getElementById(tableId);
+      if (!table) return;
+      const rows = Array.from(table.querySelectorAll('tr'));
+      const csvLines = rows.map(row => {
+        const cells = Array.from(row.querySelectorAll('th, td'));
+        return cells.map(cell => {
+          const text = (cell.innerText || '').replace(/\s+/g, ' ').trim();
+          return `"${text.replace(/"/g, '""')}"`;
+        }).join(',');
+      });
+      const csvContent = '\uFEFF' + csvLines.join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTab1();
+    });
+  </script>
 </body>
 </html>
